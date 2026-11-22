@@ -20,6 +20,11 @@ import {
   FolderTree,
   Tag as TagIcon,
   X,
+  Maximize2,
+  Minimize2,
+  Copy,
+  CheckCheck,
+  Columns,
 } from 'lucide-react';
 
 export const EntryEditorPage: React.FC = () => {
@@ -84,6 +89,33 @@ export const EntryEditorPage: React.FC = () => {
   const [tagsList, setTagsList] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
   const [isCollectionPickerOpen, setIsCollectionPickerOpen] = useState(false);
+
+  // Gold-standard Zen / Focus mode & Canvas Width
+  const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
+  const [isWide, setIsWide] = useState<boolean>(false);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+
+  // Escape key exits focus mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFocusMode) {
+        setIsFocusMode(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFocusMode]);
+
+  const handleCopyContent = async () => {
+    try {
+      const fullContent = title ? `# ${title}\n\n${contentText}` : contentText;
+      await navigator.clipboard.writeText(fullContent);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {
+      // fallback
+    }
+  };
 
   // Load existing entry if editing
   useEffect(() => {
@@ -252,100 +284,160 @@ export const EntryEditorPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-28 animate-in fade-in duration-200">
-      {/* Top Header Bar */}
-      <div className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] text-xs text-[var(--text-tertiary)] select-none">
-        <button
-          onClick={() => {
-            flushSave();
-            navigate('/journal');
-          }}
-          className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Journal</span>
-        </button>
+    <div
+      className={`${
+        isFocusMode
+          ? 'fixed inset-0 z-50 bg-[var(--bg-base)] overflow-y-auto px-4 sm:px-8 py-10 flex flex-col items-center'
+          : `${isWide ? 'max-w-4xl' : 'max-w-3xl'} mx-auto space-y-6 pb-28 animate-in fade-in duration-200`
+      }`}
+    >
+      {/* Zen Mode Exit Floating Pill */}
+      {isFocusMode && (
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            type="button"
+            onClick={() => setIsFocusMode(false)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-sm cursor-pointer"
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+            <span>Exit Zen Mode (Esc)</span>
+          </button>
+        </div>
+      )}
 
-        {/* Sync Status Badge */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            {localSyncStatus === 'saving' && (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent-olive)]" />
-                <span>Saving...</span>
-              </>
-            )}
-            {localSyncStatus === 'saved' && (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-700 dark:text-emerald-400">Saved to cloud</span>
-              </>
-            )}
-            {localSyncStatus === 'offline_saved' && (
-              <>
-                <Cloud className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                <span className="text-amber-700 dark:text-amber-400">Offline — saved locally</span>
-              </>
-            )}
-            {localSyncStatus === 'error' && (
-              <>
-                <CloudOff className="w-3.5 h-3.5 text-rose-500" />
-                <span className="text-rose-600">Saved locally (sync pending)</span>
-              </>
-            )}
-          </div>
+      <div className={`w-full ${isFocusMode ? (isWide ? 'max-w-4xl' : 'max-w-3xl') : ''} space-y-6`}>
+        {/* Top Header Bar */}
+        <div className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] text-xs text-[var(--text-tertiary)] select-none">
+          <button
+            onClick={() => {
+              flushSave();
+              navigate('/journal');
+            }}
+            className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Journal</span>
+          </button>
 
-          <div className="flex items-center gap-1.5 text-[var(--text-tertiary)]">
-            <Clock className="w-3.5 h-3.5" />
-            <span>
-              {new Date(createdAt).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
-          </div>
+          {/* Sync Status Badge */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-1.5">
+              {localSyncStatus === 'saving' && (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent-olive)]" />
+                  <span className="hidden sm:inline">Saving...</span>
+                </>
+              )}
+              {localSyncStatus === 'saved' && (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-emerald-700 dark:text-emerald-400 hidden sm:inline">Saved to cloud</span>
+                </>
+              )}
+              {localSyncStatus === 'offline_saved' && (
+                <>
+                  <Cloud className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-amber-700 dark:text-amber-400 hidden sm:inline">Saved locally</span>
+                </>
+              )}
+              {localSyncStatus === 'error' && (
+                <>
+                  <CloudOff className="w-3.5 h-3.5 text-rose-500" />
+                  <span className="text-rose-600 hidden sm:inline">Saved locally</span>
+                </>
+              )}
+            </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => {
-                setIsFavourite(!isFavourite);
-                toggleFavourite(entryId);
-              }}
-              title={isFavourite ? 'Unfavourite' : 'Add to favourites'}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                isFavourite
-                  ? 'text-amber-500 bg-amber-500/10'
-                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              <Star className="w-4 h-4" fill={isFavourite ? 'currentColor' : 'none'} />
-            </button>
+            <div className="flex items-center gap-1.5 text-[var(--text-tertiary)]">
+              <Clock className="w-3.5 h-3.5" />
+              <span>
+                {new Date(createdAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+            </div>
 
-            <button
-              onClick={() => {
-                setIsArchived(!isArchived);
-                toggleArchive(entryId);
-              }}
-              title={isArchived ? 'Restore from archive' : 'Archive entry'}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                isArchived
-                  ? 'text-[var(--accent-olive)] bg-[var(--accent-olive-soft)]'
-                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              <Archive className="w-4 h-4" />
-            </button>
+            {/* Actions */}
+            <div className="flex items-center gap-1">
+              {/* Width toggle */}
+              <button
+                type="button"
+                onClick={() => setIsWide(!isWide)}
+                title={isWide ? 'Comfortable reading width' : 'Wide writing canvas'}
+                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+              >
+                <Columns className="w-3.5 h-3.5" />
+              </button>
 
-            <button
-              onClick={handleDelete}
-              title="Delete entry"
-              className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-rose-500 transition-colors cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+              {/* Quick Copy */}
+              <button
+                type="button"
+                onClick={handleCopyContent}
+                title="Copy markdown to clipboard"
+                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+              >
+                {isCopied ? (
+                  <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+              </button>
+
+              {/* Zen Mode Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsFocusMode(!isFocusMode)}
+                title={isFocusMode ? 'Exit Zen Mode (Esc)' : 'Zen Focus Mode (F)'}
+                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+              >
+                {isFocusMode ? (
+                  <Minimize2 className="w-3.5 h-3.5 text-[var(--accent-olive)]" />
+                ) : (
+                  <Maximize2 className="w-3.5 h-3.5" />
+                )}
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsFavourite(!isFavourite);
+                  toggleFavourite(entryId);
+                }}
+                title={isFavourite ? 'Unfavourite' : 'Add to favourites'}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  isFavourite
+                    ? 'text-amber-500 bg-amber-500/10'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <Star className="w-4 h-4" fill={isFavourite ? 'currentColor' : 'none'} />
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsArchived(!isArchived);
+                  toggleArchive(entryId);
+                }}
+                title={isArchived ? 'Restore from archive' : 'Archive entry'}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  isArchived
+                    ? 'text-[var(--accent-olive)] bg-[var(--accent-olive-soft)]'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <Archive className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={handleDelete}
+                title="Delete entry"
+                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-rose-500 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

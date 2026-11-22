@@ -6,6 +6,8 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import { FontSize, TextColor, TextHighlight, FontFamily } from './extensions/tiptapExtensions';
 import { EditorToolbar } from './EditorToolbar';
+import { FloatingBubbleMenu } from './FloatingBubbleMenu';
+import { SlashCommandMenu } from './SlashCommandMenu';
 
 interface TipTapEditorProps {
   initialContent?: Record<string, unknown> | string;
@@ -71,8 +73,14 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
   }, [editor, initialContent]);
 
   return (
-    <div className="space-y-3">
-      {editable && <EditorToolbar editor={editor} />}
+    <div className="space-y-3 relative">
+      {editable && (
+        <>
+          <EditorToolbar editor={editor} />
+          <FloatingBubbleMenu editor={editor} />
+          <SlashCommandMenu editor={editor} />
+        </>
+      )}
       <div className="pt-2">
         <EditorContent editor={editor} />
       </div>

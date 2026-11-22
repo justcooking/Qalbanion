@@ -84,7 +84,7 @@ export const LandingPage: React.FC = () => {
         <div className="text-center space-y-6 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-olive-soft)] border border-[var(--accent-olive)]/30 text-[var(--accent-olive-text)] text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>A Quiet, Personal Space for Your Mind</span>
+            <span>A Companion for Your Heart</span>
           </div>
 
           <h1 className="font-editorial text-5xl sm:text-6xl md:text-7xl font-normal tracking-tight text-[var(--text-primary)] leading-[1.1]">
@@ -220,7 +220,7 @@ export const LandingPage: React.FC = () => {
       <footer className="border-t border-[var(--border-subtle)] py-8 max-w-5xl w-full mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-tertiary)]">
         <div className="flex items-center gap-2">
           <Feather className="w-4 h-4 text-[var(--accent-olive)]" />
-          <span>Qalbanion — A place to put your thoughts into words.</span>
+          <span>Qalbanion — A companion for your heart.</span>
         </div>
         <div className="flex items-center gap-4">
           <a

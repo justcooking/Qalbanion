@@ -58,8 +58,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
               <h1 className="font-editorial text-2xl font-medium tracking-tight text-[var(--text-primary)] leading-none">
                 Qalbanion
               </h1>
-              <p className="text-[11px] text-[var(--text-tertiary)] tracking-wide mt-1 font-sans uppercase">
-                Quiet Journal
+              <p className="text-[11px] text-[var(--text-tertiary)] tracking-wide mt-1 font-sans">
+                A companion for your heart
               </p>
             </div>
           </div>

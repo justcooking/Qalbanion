@@ -1,6 +1,6 @@
-# Qalbanion (قلبانِيون)
+# Qalbanion (قلبانِيون) — A Companion for Your Heart
 
-> *"A place to put your thoughts into words, and a place to understand what those words reveal over time."*
+> *"A companion for your heart — A place to put your thoughts into words, and a place to understand what those words reveal over time."*
 
 [![Live Demo](https://img.shields.io/badge/Live%20App-Try%20Qalbanion-5E6D55?style=for-the-badge)](https://qalbanion.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2C2B29?style=for-the-badge)](LICENSE)
@@ -9,7 +9,7 @@
 
 ## What is Qalbanion?
 
-**Qalbanion** is a private, personal journal designed for clarity, quiet reflection, and effortless writing.
+**Qalbanion** (*from Qalb, the Arabic word for heart*) is a private, personal journal designed as a calm, lifelong companion for your heart and mind.
 
 Most modern note-taking apps and journals have turned into productivity dashboards—pressuring you with daily streak counters, reminder notifications, to-do lists, and complex folder hierarchies. 
 

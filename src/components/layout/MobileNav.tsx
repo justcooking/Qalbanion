@@ -145,8 +145,8 @@ export const MobileNav: React.FC = () => {
             )}
 
             <div className="text-xs text-[var(--text-tertiary)] flex justify-between items-center">
-              <span>A place to put your thoughts into words.</span>
-              <span className="font-mono">v0.1.0</span>
+              <span>A companion for your heart.</span>
+              <span className="font-mono">v1.0.0</span>
             </div>
           </div>
         </div>

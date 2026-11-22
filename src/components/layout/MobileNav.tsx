@@ -15,15 +15,18 @@ import {
   Home,
   LogIn,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  Download
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
 
 export const MobileNav: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { user, profile, signOut } = useAuth();
+  const { isInstallable, installApp } = usePWAInstall();
   const navigate = useNavigate();
 
   const navItems = [
@@ -111,6 +114,22 @@ export const MobileNav: React.FC = () => {
           </div>
 
           <div className="pt-6 border-t border-[var(--border-subtle)] space-y-4">
+            {isInstallable && (
+              <button
+                onClick={() => {
+                  installApp();
+                  setIsOpen(false);
+                }}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] text-sm font-medium border border-[var(--accent-olive)]/20 cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Download className="w-4 h-4" />
+                  <span>Install Qalbanion App</span>
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">App</span>
+              </button>
+            )}
+
             {/* User Account / Auth */}
             {user ? (
               <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-surface-elevated)] text-sm">

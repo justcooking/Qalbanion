@@ -14,10 +14,12 @@ import {
   Home,
   LogIn,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  Download
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
 
 interface SidebarProps {
   onNewEntry?: () => void;
@@ -26,6 +28,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, profile, signOut } = useAuth();
+  const { isInstallable, installApp } = usePWAInstall();
   const navigate = useNavigate();
 
   const handleQuickNew = () => {
@@ -133,6 +136,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
             </div>
             <span className="text-[10px] text-[var(--text-tertiary)]">Optional</span>
           </NavLink>
+        )}
+
+        {/* Install Desktop/Mobile Web App Button */}
+        {isInstallable && (
+          <button
+            onClick={installApp}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--accent-olive-soft)] hover:bg-[var(--accent-olive)]/15 text-[var(--accent-olive)] border border-[var(--accent-olive)]/20 text-xs font-medium transition-all cursor-pointer group"
+          >
+            <div className="flex items-center gap-2">
+              <Download className="w-3.5 h-3.5 transition-transform group-hover:translate-y-0.5" />
+              <span>Install Qalbanion App</span>
+            </div>
+            <span className="text-[10px] uppercase font-semibold tracking-wider opacity-70">App</span>
+          </button>
         )}
 
         {/* Status Pill */}

@@ -60,22 +60,30 @@ export const getDB = () => {
 };
 
 // ==========================================
-// DRAFTS
+// DRAFTS & ENTRIES (Unified Local-First Store)
 // ==========================================
 
 export const saveLocalDraft = async (entry: JournalEntry): Promise<void> => {
   const db = await getDB();
-  await db.put('drafts', entry);
+  const tx = db.transaction(['drafts', 'cached_entries'], 'readwrite');
+  await tx.objectStore('drafts').put(entry);
+  await tx.objectStore('cached_entries').put(entry);
+  await tx.done;
 };
 
 export const getLocalDraft = async (id: string): Promise<JournalEntry | undefined> => {
   const db = await getDB();
-  return db.get('drafts', id);
+  const draft = await db.get('drafts', id);
+  if (draft) return draft;
+  return db.get('cached_entries', id);
 };
 
 export const deleteLocalDraft = async (id: string): Promise<void> => {
   const db = await getDB();
-  await db.delete('drafts', id);
+  const tx = db.transaction(['drafts', 'cached_entries'], 'readwrite');
+  await tx.objectStore('drafts').delete(id);
+  await tx.objectStore('cached_entries').delete(id);
+  await tx.done;
 };
 
 // ==========================================
@@ -84,24 +92,51 @@ export const deleteLocalDraft = async (id: string): Promise<void> => {
 
 export const cacheEntriesLocally = async (entries: JournalEntry[]): Promise<void> => {
   const db = await getDB();
-  const tx = db.transaction('cached_entries', 'readwrite');
+  const tx = db.transaction(['cached_entries', 'drafts'], 'readwrite');
   for (const entry of entries) {
-    await tx.store.put(entry);
+    await tx.objectStore('cached_entries').put(entry);
+    await tx.objectStore('drafts').put(entry);
   }
   await tx.done;
 };
 
 export const getCachedEntriesLocally = async (userId?: string): Promise<JournalEntry[]> => {
   const db = await getDB();
-  if (userId) {
-    return db.getAllFromIndex('cached_entries', 'by-user', userId);
+  const [cached, drafts] = await Promise.all([
+    db.getAll('cached_entries'),
+    db.getAll('drafts'),
+  ]);
+
+  // Merge cached and drafts by ID
+  const map = new Map<string, JournalEntry>();
+  for (const item of [...cached, ...drafts]) {
+    // If filtering by user, allow matching user_id OR local_guest
+    if (userId && item.user_id && item.user_id !== userId && item.user_id !== 'local_guest') {
+      continue;
+    }
+    const existing = map.get(item.id);
+    if (!existing) {
+      map.set(item.id, item);
+    } else {
+      const existingDate = new Date(existing.client_updated_at || existing.updated_at).getTime();
+      const itemDate = new Date(item.client_updated_at || item.updated_at).getTime();
+      if (itemDate >= existingDate) {
+        map.set(item.id, item);
+      }
+    }
   }
-  return db.getAll('cached_entries');
+
+  const result = Array.from(map.values());
+  result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  return result;
 };
 
 export const deleteCachedEntryLocally = async (id: string): Promise<void> => {
   const db = await getDB();
-  await db.delete('cached_entries', id);
+  const tx = db.transaction(['cached_entries', 'drafts'], 'readwrite');
+  await tx.objectStore('cached_entries').delete(id);
+  await tx.objectStore('drafts').delete(id);
+  await tx.done;
 };
 
 // ==========================================

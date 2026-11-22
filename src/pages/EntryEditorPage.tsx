@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useJournal, type SyncStatus } from '../hooks/useJournal';
@@ -36,13 +36,22 @@ export const EntryEditorPage: React.FC = () => {
     setEntryTags,
   } = useCollections();
 
-  const initialData = (location.state as { initialContent?: string; initialMood?: MoodType | null }) || {};
+  const initialData = (location.state as {
+    initialContent?: string;
+    initialMood?: MoodType | null;
+    initialTitle?: string;
+    initialEntryType?: EntryType;
+    initialContentJson?: Record<string, unknown>;
+  }) || {};
 
   // Active Entry State
   const [entryId] = useState<string>(() => id || crypto.randomUUID());
-  const [title, setTitle] = useState<string>('');
-  const [entryType, setEntryType] = useState<EntryType>('journal');
+  const [title, setTitle] = useState<string>(() => initialData.initialTitle || '');
+  const [entryType, setEntryType] = useState<EntryType>(() => initialData.initialEntryType || 'journal');
   const [contentJson, setContentJson] = useState<Record<string, unknown>>(() => {
+    if (initialData.initialContentJson) {
+      return initialData.initialContentJson;
+    }
     if (initialData.initialContent) {
       return {
         type: 'doc',
@@ -66,6 +75,9 @@ export const EntryEditorPage: React.FC = () => {
   const [createdAt, setCreatedAt] = useState<string>(new Date().toISOString());
   const [isReady, setIsReady] = useState<boolean>(!id);
   const [localSyncStatus, setLocalSyncStatus] = useState<SyncStatus>('saved');
+
+  // Ref tracking latest entry state for immediate flush on exit/unmount
+  const latestEntryRef = useRef<JournalEntry | null>(null);
 
   // Collections & Tags for this entry
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
@@ -110,33 +122,59 @@ export const EntryEditorPage: React.FC = () => {
   // Debounced autosave
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const flushSave = useCallback(() => {
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+      autosaveTimerRef.current = null;
+    }
+    if (latestEntryRef.current) {
+      if (latestEntryRef.current.title || latestEntryRef.current.content_text) {
+        saveEntry(latestEntryRef.current, true);
+      }
+    }
+  }, [saveEntry]);
+
+  // Ensure content is flushed immediately when navigating away or unmounting
+  useEffect(() => {
+    return () => {
+      if (latestEntryRef.current) {
+        if (latestEntryRef.current.title || latestEntryRef.current.content_text) {
+          saveEntry(latestEntryRef.current, true);
+        }
+      }
+    };
+  }, [saveEntry]);
+
   const triggerAutosave = (updatedFields: Partial<JournalEntry>) => {
     setLocalSyncStatus('saving');
+
+    const entryToSave: JournalEntry = {
+      id: entryId,
+      user_id: user?.id || 'local_guest',
+      title: updatedFields.title !== undefined ? updatedFields.title : (title.trim() || null),
+      content_json: updatedFields.content_json !== undefined ? updatedFields.content_json : contentJson,
+      content_text: updatedFields.content_text !== undefined ? updatedFields.content_text : contentText,
+      entry_type: updatedFields.entry_type || entryType,
+      mood: updatedFields.mood !== undefined ? updatedFields.mood : selectedMood,
+      status: (updatedFields.status || (isArchived ? 'archived' : 'active')),
+      is_favourite: updatedFields.is_favourite !== undefined ? updatedFields.is_favourite : isFavourite,
+      word_count: updatedFields.word_count !== undefined ? updatedFields.word_count : wordCount,
+      client_updated_at: new Date().toISOString(),
+      created_at: createdAt,
+      updated_at: new Date().toISOString(),
+    };
+
+    latestEntryRef.current = entryToSave;
 
     if (autosaveTimerRef.current) {
       clearTimeout(autosaveTimerRef.current);
     }
 
+    // Fast 200ms debounce for in-memory & local-first persistence
     autosaveTimerRef.current = setTimeout(() => {
-      const entryToSave: JournalEntry = {
-        id: entryId,
-        user_id: user?.id || 'local_guest',
-        title: updatedFields.title !== undefined ? updatedFields.title : (title.trim() || null),
-        content_json: updatedFields.content_json !== undefined ? updatedFields.content_json : contentJson,
-        content_text: updatedFields.content_text !== undefined ? updatedFields.content_text : contentText,
-        entry_type: updatedFields.entry_type || entryType,
-        mood: updatedFields.mood !== undefined ? updatedFields.mood : selectedMood,
-        status: (updatedFields.status || (isArchived ? 'archived' : 'active')),
-        is_favourite: updatedFields.is_favourite !== undefined ? updatedFields.is_favourite : isFavourite,
-        word_count: updatedFields.word_count !== undefined ? updatedFields.word_count : wordCount,
-        client_updated_at: new Date().toISOString(),
-        created_at: createdAt,
-        updated_at: new Date().toISOString(),
-      };
-
       saveEntry(entryToSave);
       setLocalSyncStatus(user && navigator.onLine ? 'saved' : 'offline_saved');
-    }, 700);
+    }, 200);
   };
 
   const handleTitleChange = (val: string) => {
@@ -208,7 +246,7 @@ export const EntryEditorPage: React.FC = () => {
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this entry?')) {
-      deleteEntry(entryId, false);
+      deleteEntry(entryId);
       navigate('/journal');
     }
   };
@@ -218,7 +256,10 @@ export const EntryEditorPage: React.FC = () => {
       {/* Top Header Bar */}
       <div className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] text-xs text-[var(--text-tertiary)] select-none">
         <button
-          onClick={() => navigate('/journal')}
+          onClick={() => {
+            flushSave();
+            navigate('/journal');
+          }}
           className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />

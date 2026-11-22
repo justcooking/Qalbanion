@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
+import { FontSize, TextColor, TextHighlight, FontFamily } from './extensions/tiptapExtensions';
 import { EditorToolbar } from './EditorToolbar';
 
 interface TipTapEditorProps {
@@ -38,6 +39,10 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
         placeholder,
         emptyEditorClass: 'is-editor-empty',
       }),
+      FontSize,
+      TextColor,
+      TextHighlight,
+      FontFamily,
     ],
     content: initialContent || '',
     editorProps: {

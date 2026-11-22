@@ -184,5 +184,5 @@ export const TYPOGRAPHY_PRESETS: TypographyPreset[] = [
   },
 ];
 
-export type BodySize = 'normal' | 'large' | 'reading';
+export type BodySize = 'small' | 'normal' | 'large' | 'reading' | 'xlarge';
 export type LineSpacing = 'relaxed' | 'spacious' | 'compact';

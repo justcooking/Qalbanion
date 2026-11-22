@@ -129,21 +129,23 @@ export const TypographySettings: React.FC = () => {
         {/* Body Size */}
         <div className="space-y-2">
           <label className="text-xs font-medium text-[var(--text-secondary)] block">
-            Body Text Size
+            Overall Journal Font Size
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {(
               [
-                { id: 'normal', label: 'Default (16px)' },
-                { id: 'large', label: 'Editorial (18px)' },
-                { id: 'reading', label: 'Comfort (20px)' },
+                { id: 'small', label: '14px' },
+                { id: 'normal', label: '16px' },
+                { id: 'large', label: '18px' },
+                { id: 'reading', label: '20px' },
+                { id: 'xlarge', label: '22px' },
               ] as { id: BodySize; label: string }[]
             ).map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => setBodySize(s.id)}
-                className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
+                className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-medium border text-center transition-colors cursor-pointer ${
                   bodySize === s.id
                     ? 'border-[var(--accent-olive)] bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)]'
                     : 'border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'

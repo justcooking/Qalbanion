@@ -97,10 +97,12 @@ export const TypographyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     root.style.setProperty('--font-body', activeBodyFont.family);
 
     // Font size mapping
-    const sizeMap = {
+    const sizeMap: Record<BodySize, string> = {
+      small: '0.875rem', // 14px
       normal: '1rem', // 16px
       large: '1.125rem', // 18px (editorial standard)
       reading: '1.25rem', // 20px (comfort book)
+      xlarge: '1.375rem', // 22px (large print)
     };
     root.style.setProperty('--font-size-body', sizeMap[bodySize]);
 

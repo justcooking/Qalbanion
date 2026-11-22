@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
   };
 
   const navItems = [
-    { to: '/', label: 'Home', icon: Home },
+    { to: '/home', label: 'Home', icon: Home },
     { to: '/journal', label: 'Journal', icon: BookOpen },
     { to: '/collections', label: 'Collections', icon: FolderTree },
     { to: '/reflections', label: 'Reflections', icon: Sparkles },
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
     <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] px-4 py-6 select-none transition-colors duration-200">
       {/* Brand Header */}
       <div className="px-3 mb-6">
-        <NavLink to="/" className="group block">
+        <NavLink to="/home" className="group block">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center border border-[var(--border-subtle)]">
               <Feather className="w-4 h-4" />

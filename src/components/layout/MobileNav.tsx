@@ -27,7 +27,7 @@ export const MobileNav: React.FC = () => {
   const navigate = useNavigate();
 
   const navItems = [
-    { to: '/', label: 'Home', icon: Home },
+    { to: '/home', label: 'Home', icon: Home },
     { to: '/journal', label: 'Journal', icon: BookOpen },
     { to: '/collections', label: 'Collections', icon: FolderTree },
     { to: '/reflections', label: 'Reflections', icon: Sparkles },
@@ -44,7 +44,7 @@ export const MobileNav: React.FC = () => {
     <header className="md:hidden sticky top-0 z-40 bg-[var(--bg-surface)] border-b border-[var(--border-subtle)] px-4 py-3 select-none">
       <div className="flex items-center justify-between">
         {/* Brand */}
-        <NavLink to="/" className="flex items-center gap-2">
+        <NavLink to="/home" className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center border border-[var(--border-subtle)]">
             <Feather className="w-3.5 h-3.5" />
           </div>

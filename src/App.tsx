@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CollectionsProvider } from './contexts/CollectionsContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { HomePage } from './pages/HomePage';
 import { LandingPage } from './pages/LandingPage';
@@ -35,26 +36,28 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<RootRoute />} />
-            <Route path="/welcome" element={<LandingPage />} />
-            <Route path="/auth" element={<AuthPage />} />
+        <CollectionsProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<RootRoute />} />
+              <Route path="/welcome" element={<LandingPage />} />
+              <Route path="/auth" element={<AuthPage />} />
 
-            {/* Application Workspace Routes */}
-            <Route path="/" element={<AppLayout />}>
-              <Route path="home" element={<HomePage />} />
-              <Route path="journal" element={<JournalPage />} />
-              <Route path="journal/new" element={<EntryEditorPage />} />
-              <Route path="journal/:id" element={<EntryEditorPage />} />
-              <Route path="collections" element={<CollectionsPage />} />
-              <Route path="reflections" element={<ReflectionsPage />} />
-              <Route path="insights" element={<InsightsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+              {/* Application Workspace Routes */}
+              <Route path="/" element={<AppLayout />}>
+                <Route path="home" element={<HomePage />} />
+                <Route path="journal" element={<JournalPage />} />
+                <Route path="journal/new" element={<EntryEditorPage />} />
+                <Route path="journal/:id" element={<EntryEditorPage />} />
+                <Route path="collections" element={<CollectionsPage />} />
+                <Route path="reflections" element={<ReflectionsPage />} />
+                <Route path="insights" element={<InsightsPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </CollectionsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

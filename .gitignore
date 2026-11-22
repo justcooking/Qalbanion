@@ -7,7 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Node modules
+# Node modules & build
 node_modules
 dist
 dist-ssr
@@ -18,7 +18,7 @@ dist-ssr
 .env.*
 !.env.example
 
-# Editor and OS
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -29,8 +29,3 @@ dist-ssr
 *.sln
 *.sw?
 Thumbs.db
-
-# Testing & Coverage
-coverage
-*.lcov
-.nyc_output

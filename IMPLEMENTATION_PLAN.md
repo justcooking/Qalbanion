@@ -37,11 +37,16 @@ Following the 13-phase roadmap defined in the Product & Development Specificatio
   - Debounced cloud autosave (600ms) with animated status badges (`Saving...`, `Saved to cloud`, `Offline — saved locally`).
   - Implemented offline sync queue that automatically pushes pending mutations when internet reconnects.
   - Entry management: Favourites, Archive, Soft/Hard Delete, and chronological retrieval.
-- [ ] **Phase 6: Collections and Tags**
-  - Create, edit, and organize entries within collections and tag filters.
-- [ ] **Phase 7: Search and Timeline**
-  - Full-text search across titles and content.
-  - Chronological timeline navigation and "On This Day" historical revisit.
+- [x] **Phase 6: Collections and Tags**
+  - Built `useCollections.ts` supporting full CRUD for user-defined collections and tags.
+  - Interactive `CollectionsPage.tsx` with custom accent color selector, entry counts, and instant preview.
+  - Multi-collection picker and inline `#tag` creator directly embedded in `EntryEditorPage.tsx`.
+  - Non-destructive collection deletion (deleting a collection preserves all entries).
+- [x] **Phase 7: Search and Timeline**
+  - Full-text search across titles and journal prose.
+  - Dual view modes in `JournalPage.tsx`: **Feed View** and **Timeline View** (chronologically grouped by Year and Month).
+  - Subtle and nostalgic **"On This Day"** banner surfacing past thoughts written on the same calendar date in previous years.
+  - Real-time collection and tag pill filters.
 - [ ] **Phase 8: Reflection Module**
   - Guided templates (Daily, Weekly, Decision, Experience, Personal).
 - [ ] **Phase 9: Insights**

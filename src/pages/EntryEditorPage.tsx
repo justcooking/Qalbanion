@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useJournal, type SyncStatus } from '../hooks/useJournal';
+import { useCollections } from '../hooks/useCollections';
 import { TipTapEditor } from '../components/editor/TipTapEditor';
 import type { JournalEntry, EntryType, MoodType } from '../types/journal';
 import {
@@ -16,6 +17,9 @@ import {
   Trash2,
   Clock,
   Sparkles,
+  FolderTree,
+  Tag as TagIcon,
+  X,
 } from 'lucide-react';
 
 export const EntryEditorPage: React.FC = () => {
@@ -24,6 +28,13 @@ export const EntryEditorPage: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { saveEntry, loadEntry, deleteEntry, toggleFavourite, toggleArchive } = useJournal();
+  const {
+    collections,
+    getEntryCollections,
+    setEntryCollections,
+    getEntryTags,
+    setEntryTags,
+  } = useCollections();
 
   const initialData = (location.state as { initialContent?: string; initialMood?: MoodType | null }) || {};
 
@@ -56,6 +67,12 @@ export const EntryEditorPage: React.FC = () => {
   const [isReady, setIsReady] = useState<boolean>(!id);
   const [localSyncStatus, setLocalSyncStatus] = useState<SyncStatus>('saved');
 
+  // Collections & Tags for this entry
+  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [tagsList, setTagsList] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState<string>('');
+  const [isCollectionPickerOpen, setIsCollectionPickerOpen] = useState(false);
+
   // Load existing entry if editing
   useEffect(() => {
     if (!id) return;
@@ -77,10 +94,18 @@ export const EntryEditorPage: React.FC = () => {
       setIsReady(true);
     });
 
+    // Load entry's collections & tags
+    getEntryCollections(id).then((cols) => {
+      if (isCurrent) setSelectedCollections(cols);
+    });
+    getEntryTags(id).then((tags) => {
+      if (isCurrent) setTagsList(tags);
+    });
+
     return () => {
       isCurrent = false;
     };
-  }, [id, loadEntry]);
+  }, [id, loadEntry, getEntryCollections, getEntryTags]);
 
   // Debounced autosave
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -135,6 +160,35 @@ export const EntryEditorPage: React.FC = () => {
     const next = selectedMood === mood ? null : mood;
     setSelectedMood(next);
     triggerAutosave({ mood: next });
+  };
+
+  // Toggle Collection Assignment
+  const toggleCollection = (colId: string) => {
+    const next = selectedCollections.includes(colId)
+      ? selectedCollections.filter((c) => c !== colId)
+      : [...selectedCollections, colId];
+    setSelectedCollections(next);
+    setEntryCollections(entryId, next);
+  };
+
+  // Add Tag
+  const handleAddTag = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const clean = tagInput.trim().replace(/^[#,]/, '');
+      if (clean && !tagsList.includes(clean)) {
+        const next = [...tagsList, clean];
+        setTagsList(next);
+        setEntryTags(entryId, next);
+      }
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveTag = (tagName: string) => {
+    const next = tagsList.filter((t) => t !== tagName);
+    setTagsList(next);
+    setEntryTags(entryId, next);
   };
 
   const moods: { label: MoodType; icon: string }[] = [
@@ -320,6 +374,93 @@ export const EntryEditorPage: React.FC = () => {
               <span>{m.label}</span>
             </button>
           ))}
+        </div>
+
+        {/* Collections & Tags Row */}
+        <div className="flex flex-wrap items-center gap-4 text-xs">
+          {/* Collections Picker */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsCollectionPickerOpen(!isCollectionPickerOpen)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-olive)] transition-colors cursor-pointer"
+            >
+              <FolderTree className="w-3.5 h-3.5 text-[var(--accent-olive)]" />
+              <span>
+                {selectedCollections.length === 0
+                  ? 'Assign to collection'
+                  : `${selectedCollections.length} collection${selectedCollections.length > 1 ? 's' : ''}`}
+              </span>
+            </button>
+
+            {isCollectionPickerOpen && (
+              <div className="absolute left-0 bottom-full mb-2 w-64 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg z-20 space-y-2 animate-in fade-in zoom-in-95 duration-100">
+                <div className="flex items-center justify-between text-xs font-medium text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">
+                  <span>Collections</span>
+                  <button
+                    onClick={() => setIsCollectionPickerOpen(false)}
+                    className="p-0.5 text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {collections.length === 0 ? (
+                  <p className="text-[11px] text-[var(--text-tertiary)] py-2 text-center">
+                    No collections yet. Go to Collections page to create one.
+                  </p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto space-y-1">
+                    {collections.map((col) => {
+                      const isAssigned = selectedCollections.includes(col.id);
+                      return (
+                        <button
+                          key={col.id}
+                          type="button"
+                          onClick={() => toggleCollection(col.id)}
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-left transition-colors cursor-pointer ${
+                            isAssigned
+                              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium'
+                              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
+                          }`}
+                        >
+                          <span className="truncate">{col.name}</span>
+                          {isAssigned && <Check className="w-3.5 h-3.5 text-[var(--accent-olive)] shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Tags Inline Pills & Input */}
+          <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-[200px]">
+            <TagIcon className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
+            {tagsList.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)]"
+              >
+                <span>#{tag}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  className="hover:text-rose-500 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleAddTag}
+              placeholder="Add tag (press Enter)..."
+              className="bg-transparent text-xs text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none min-w-[120px]"
+            />
+          </div>
         </div>
 
         {/* Word Count & Read Time */}

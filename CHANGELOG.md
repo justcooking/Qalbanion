@@ -2,6 +2,21 @@
 
 All notable changes to the Qalbanion project will be documented in this file.
 
+## [0.4.0] - Phase 6 & Phase 7: Collections, Tags, Timeline & "On This Day"
+
+### Added
+- **Thematic Collections (`src/hooks/useCollections.ts` & `src/pages/CollectionsPage.tsx`)**:
+  - Full CRUD operations with custom palette colors (Muted Olive, Terracotta, Deep Slate, Sage, Plum, Amber).
+  - Safety rule enforced: deleting a collection does not delete its underlying journal entries.
+  - Multi-collection assignment picker inside the writing editor.
+- **Tags Engine**:
+  - Inline tag manager in `EntryEditorPage.tsx` supporting `#tags` via Enter/comma shortcuts.
+  - Relational mapping in Supabase (`entry_tags`) with local offline fallback.
+- **Timeline & "On This Day" Experience (`src/pages/JournalPage.tsx`)**:
+  - Dual layout toggle: **Feed View** and **Timeline View** (chronologically grouped by Year and Month).
+  - "On This Day" recognition highlighting past entries written on the exact calendar day.
+  - Interactive multi-criteria filtering across collections, tags, moods, and search text.
+
 ## [0.3.0] - Phase 4 & Phase 5: Rich-Text Editor & Local-First Autosave Engine
 
 ### Added

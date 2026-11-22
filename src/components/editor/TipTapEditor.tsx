@@ -43,7 +43,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
     editorProps: {
       attributes: {
         class:
-          'focus:outline-none min-h-[350px] font-sans text-base sm:text-lg leading-relaxed text-[var(--text-primary)] prose-editorial',
+          'focus:outline-none min-h-[350px] text-[var(--text-primary)] prose-editorial',
       },
     },
     onUpdate: ({ editor }) => {

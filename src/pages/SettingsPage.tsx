@@ -5,6 +5,7 @@ import { useJournal } from '../hooks/useJournal';
 import { useCollections } from '../hooks/useCollections';
 import { exportToMarkdown, exportToPlainText, exportToJSON, downloadFile } from '../utils/export';
 import { AIWorkspaceModal } from '../components/ai/AIWorkspaceModal';
+import { TypographySettings } from '../components/settings/TypographySettings';
 import {
   Sun,
   Moon,
@@ -131,6 +132,9 @@ export const SettingsPage: React.FC = () => {
             </button>
           </div>
         </section>
+
+        {/* Typography & Aesthetic Font Customizer */}
+        <TypographySettings />
 
         {/* Optional AI Assistant */}
         <section className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-4">

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { TypographyProvider } from './contexts/TypographyContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CollectionsProvider } from './contexts/CollectionsContext';
 import { AppLayout } from './components/layout/AppLayout';
@@ -35,30 +36,32 @@ const RootRoute: React.FC = () => {
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <CollectionsProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<RootRoute />} />
-              <Route path="/welcome" element={<LandingPage />} />
-              <Route path="/auth" element={<AuthPage />} />
+      <TypographyProvider>
+        <AuthProvider>
+          <CollectionsProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<RootRoute />} />
+                <Route path="/welcome" element={<LandingPage />} />
+                <Route path="/auth" element={<AuthPage />} />
 
-              {/* Application Workspace Routes */}
-              <Route path="/" element={<AppLayout />}>
-                <Route path="home" element={<HomePage />} />
-                <Route path="journal" element={<JournalPage />} />
-                <Route path="journal/new" element={<EntryEditorPage />} />
-                <Route path="journal/:id" element={<EntryEditorPage />} />
-                <Route path="collections" element={<CollectionsPage />} />
-                <Route path="reflections" element={<ReflectionsPage />} />
-                <Route path="insights" element={<InsightsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </CollectionsProvider>
-      </AuthProvider>
+                {/* Application Workspace Routes */}
+                <Route path="/" element={<AppLayout />}>
+                  <Route path="home" element={<HomePage />} />
+                  <Route path="journal" element={<JournalPage />} />
+                  <Route path="journal/new" element={<EntryEditorPage />} />
+                  <Route path="journal/:id" element={<EntryEditorPage />} />
+                  <Route path="collections" element={<CollectionsPage />} />
+                  <Route path="reflections" element={<ReflectionsPage />} />
+                  <Route path="insights" element={<InsightsPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </CollectionsProvider>
+        </AuthProvider>
+      </TypographyProvider>
     </ThemeProvider>
   );
 }

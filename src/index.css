@@ -14,6 +14,10 @@
     --accent-olive-hover: #4D5B45;
     --accent-olive-soft: #EFF2ED;
     --accent-olive-text: #3F4B38;
+    --font-heading: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --font-body: 'Lora', Georgia, serif;
+    --font-size-body: 1.125rem;
+    --line-height-body: 1.8;
   }
 
   .dark {
@@ -34,24 +38,38 @@
   body {
     background-color: var(--bg-base);
     color: var(--text-primary);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
     min-height: 100vh;
     letter-spacing: -0.01em;
   }
 
   h1, h2, h3, .font-editorial {
-    font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-heading) !important;
+  }
+
+  .font-body {
+    font-family: var(--font-body) !important;
   }
 }
 
 /* TipTap Editorial Prose Styling */
+.prose-editorial {
+  font-family: var(--font-body) !important;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
 .prose-editorial p {
+  font-family: var(--font-body) !important;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   margin-bottom: 1.25em;
-  line-height: 1.75;
 }
 
 .prose-editorial h1 {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: var(--font-heading) !important;
   font-size: 2.25rem;
   font-weight: 500;
   line-height: 1.25;
@@ -61,7 +79,7 @@
 }
 
 .prose-editorial h2 {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: var(--font-heading) !important;
   font-size: 1.75rem;
   font-weight: 500;
   line-height: 1.3;
@@ -70,11 +88,18 @@
 }
 
 .prose-editorial h3 {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: var(--font-heading) !important;
   font-size: 1.35rem;
   font-weight: 500;
   line-height: 1.4;
   margin-top: 1em;
+  margin-bottom: 0.4em;
+}
+
+.prose-editorial li {
+  font-family: var(--font-body) !important;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   margin-bottom: 0.4em;
 }
 

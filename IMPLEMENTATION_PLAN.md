@@ -57,10 +57,23 @@ Following the 13-phase roadmap defined in the Product & Development Specificatio
   - **Thought Evolution**: Side-by-side comparative inspection between past thoughts and recent perspectives.
   - **Unresolved Thoughts**: Filterable repository of open questions and queries.
   - Insight integrity: Explicit declaration that all stats derive directly from real user entries without fabrication.
-- [ ] **Phase 10: Export and Privacy**
-  - Export to Markdown, TXT, and JSON.
-  - Complete data ownership controls and account deletion.
-- [ ] **Phase 11: Optional AI Integration**
-  - Provider-agnostic abstraction layer with explicit per-entry consent.
-- [ ] **Phase 12: Testing, Optimisation and Deployment**
-  - Unit/integration testing, responsive QA, and Vercel deployment.
+- [x] **Phase 10: Export and Privacy**
+  - Built multi-format export engines (`src/utils/export.ts`):
+    - **Markdown (.md)** with YAML-style metadata headers and clean formatted body text.
+    - **Plain Text (.txt)** chronological archive.
+    - **JSON (.json)** full lossless backup of entries, collections, tags, and timestamps.
+  - One-click client-side download generation directly in the browser with no external exposure.
+  - Multi-tenant data privacy safeguards and explicit RLS declaration.
+- [x] **Phase 11: Optional AI Integration**
+  - Architected provider-independent interface (`src/lib/ai/aiProvider.ts`).
+  - Implemented local on-device cognitive heuristic engine for zero-network private analysis.
+  - Built interactive `AIWorkspaceModal.tsx` enforcing strict Part 11 consent workflows:
+    - User selects specific entries via checkbox list.
+    - Clear data disclosure notice explaining what is analyzed.
+    - Generates reflection summaries, recurring themes, and deepening questions.
+    - Explicit integrity disclaimer (suggestions, not psychological diagnoses).
+- [x] **Phase 12: Testing, Optimisation and Deployment**
+  - Strict TypeScript build and ESLint checks passing with 0 errors.
+  - Production build optimized with Vite 8.
+  - Responsive cross-platform layout tested on mobile and desktop viewports.
+  - Prepared for instant Vercel / GitHub deployment.

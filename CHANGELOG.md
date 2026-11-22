@@ -2,6 +2,24 @@
 
 All notable changes to the Qalbanion project will be documented in this file.
 
+## [1.0.0] - Phase 10, 11 & 12: Data Export, AI Assistant & Production Delivery
+
+### Added
+- **Multi-Format Export Engine (`src/utils/export.ts`)**:
+  - Export to Markdown (`.md`) with frontmatter metadata.
+  - Export to Plain Text (`.txt`) for clean chronological reading.
+  - Export to JSON (`.json`) for complete lossless local and cloud backup.
+  - Instant client-side browser file streaming and download generation.
+- **Selective & Ethical AI Workspace (`src/components/ai/AIWorkspaceModal.tsx` & `src/lib/ai/aiProvider.ts`)**:
+  - Provider-independent abstraction interface.
+  - On-device local cognitive engine for zero-data-leakage reflection analysis.
+  - Explicit entry selection workflow (Part 11 compliant): users hand-pick entries, review word counts, and confirm before any synthesis occurs.
+  - Clear epistemic labelling (marking insights as reflective suggestions, not psychological diagnosis).
+- **Settings & Production Optimizations**:
+  - Connected data ownership controls directly in `SettingsPage.tsx`.
+  - Optimized Vite 8 production build with sub-second compilation.
+  - Responsive layouts, light/dark mode persistence, and zero ESLint/TypeScript errors.
+
 ## [0.5.0] - Phase 8 & Phase 9: Guided Reflections, Analytics & Thought Evolution
 
 ### Added

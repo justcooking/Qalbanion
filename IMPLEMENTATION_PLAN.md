@@ -47,10 +47,16 @@ Following the 13-phase roadmap defined in the Product & Development Specificatio
   - Dual view modes in `JournalPage.tsx`: **Feed View** and **Timeline View** (chronologically grouped by Year and Month).
   - Subtle and nostalgic **"On This Day"** banner surfacing past thoughts written on the same calendar date in previous years.
   - Real-time collection and tag pill filters.
-- [ ] **Phase 8: Reflection Module**
-  - Guided templates (Daily, Weekly, Decision, Experience, Personal).
-- [ ] **Phase 9: Insights**
-  - Activity metrics, recurring themes, thought evolution, and unresolved thoughts.
+- [x] **Phase 8: Reflection Module**
+  - Integrated template repository with pre-built models (Daily, Weekly, Decision, Experience).
+  - Built custom reflection template creator (`useReflections.ts`) with custom prompt questions.
+  - Guided session launcher that auto-structures prompts into TipTap and marks entries as `reflection`.
+- [x] **Phase 9: Insights**
+  - Activity patterns: dynamic word counts, average entry lengths, writing distribution bar charts, and monthly trend graphs.
+  - Recurring themes: tag clouds and collection streams.
+  - **Thought Evolution**: Side-by-side comparative inspection between past thoughts and recent perspectives.
+  - **Unresolved Thoughts**: Filterable repository of open questions and queries.
+  - Insight integrity: Explicit declaration that all stats derive directly from real user entries without fabrication.
 - [ ] **Phase 10: Export and Privacy**
   - Export to Markdown, TXT, and JSON.
   - Complete data ownership controls and account deletion.

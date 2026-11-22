@@ -1,84 +1,290 @@
-import React from 'react';
-import { Sparkles, Calendar, Compass, HelpCircle, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useReflections } from '../hooks/useReflections';
+import type { ReflectionTemplate } from '../types/journal';
+import {
+  Sparkles,
+  Calendar,
+  Compass,
+  HelpCircle,
+  ArrowRight,
+  Plus,
+  Trash2,
+  X,
+  BookOpen,
+} from 'lucide-react';
 
 export const ReflectionsPage: React.FC = () => {
-  const templates = [
-    {
-      title: 'Daily Reflection',
-      description: 'Review the day’s observations, lessons, and thoughts before resting.',
-      icon: Calendar,
-      prompts: ['What occupied my mind today?', 'What did I learn?', 'Is there something I want to revisit?']
-    },
-    {
-      title: 'Weekly Review',
-      description: 'Look back at patterns, shifts in thinking, and emerging priorities.',
-      icon: Compass,
-      prompts: ['What thoughts appeared repeatedly?', 'What changed in my perspective?', 'What remains unresolved?']
-    },
-    {
-      title: 'Decision Reflection',
-      description: 'Examine choices, arguments, unknowns, and potential outcomes calmly.',
-      icon: HelpCircle,
-      prompts: ['What decision am I considering?', 'What are the reasons behind each option?', 'What information am I missing?']
-    },
-    {
-      title: 'Experience & Encounter',
-      description: 'Unpack an event, conversation, or book that left an impression.',
-      icon: Sparkles,
-      prompts: ['What happened?', 'Why did this matter to me?', 'How does it influence how I act?']
-    }
-  ];
+  const navigate = useNavigate();
+  const { templates, isLoading, createTemplate, deleteTemplate } = useReflections();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [prompts, setPrompts] = useState<string[]>(['', '']);
+
+  const getTemplateIcon = (title: string) => {
+    if (title.toLowerCase().includes('daily')) return Calendar;
+    if (title.toLowerCase().includes('weekly')) return Compass;
+    if (title.toLowerCase().includes('decision')) return HelpCircle;
+    return Sparkles;
+  };
+
+  const handleStartReflection = (tpl: ReflectionTemplate) => {
+    const today = new Date().toLocaleDateString(undefined, {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+
+    // Build structured TipTap doc with each prompt as an H2 and empty paragraph underneath
+    const docContent: Record<string, unknown>[] = [];
+    tpl.prompts.forEach((prompt) => {
+      docContent.push({
+        type: 'heading',
+        attrs: { level: 2 },
+        content: [{ type: 'text', text: prompt }],
+      });
+      docContent.push({
+        type: 'paragraph',
+        content: [],
+      });
+    });
+
+    navigate('/journal/new', {
+      state: {
+        initialTitle: `${tpl.name} — ${today}`,
+        initialEntryType: 'reflection',
+        initialContentJson: {
+          type: 'doc',
+          content: docContent,
+        },
+        initialContent: tpl.prompts.map((p) => `## ${p}\n\n`).join(''),
+      },
+    });
+  };
+
+  const handleAddPromptField = () => {
+    setPrompts([...prompts, '']);
+  };
+
+  const handlePromptChange = (index: number, val: string) => {
+    const updated = [...prompts];
+    updated[index] = val;
+    setPrompts(updated);
+  };
+
+  const handleRemovePromptField = (index: number) => {
+    if (prompts.length <= 1) return;
+    setPrompts(prompts.filter((_, i) => i !== index));
+  };
+
+  const handleCreateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    await createTemplate(name.trim(), description.trim(), prompts);
+    setIsModalOpen(false);
+    setName('');
+    setDescription('');
+    setPrompts(['', '']);
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
-      <div>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight text-[var(--text-primary)]">
-          Reflections
-        </h1>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
-          Deliberate prompts to help examine specific questions and moments. Never mandatory.
-        </p>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-editorial text-4xl font-normal tracking-tight text-[var(--text-primary)]">
+            Reflections
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">
+            Deliberate prompt structures to examine choices, patterns, and questions. Never mandatory.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-sm font-medium shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          <span>New template</span>
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {templates.map((tpl) => {
-          const Icon = tpl.icon;
-          return (
-            <div
-              key={tpl.title}
-              className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all cursor-pointer flex flex-col justify-between space-y-4 group"
-            >
-              <div className="space-y-3">
-                <div className="w-8 h-8 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center">
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="font-editorial text-xl font-medium text-[var(--text-primary)] group-hover:text-[var(--accent-olive)] transition-colors">
-                    {tpl.title}
-                  </h3>
-                  <p className="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
-                    {tpl.description}
-                  </p>
+      {/* Templates Grid */}
+      {isLoading ? (
+        <div className="py-12 text-center text-sm text-[var(--text-tertiary)]">
+          Loading reflection templates...
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {templates.map((tpl) => {
+            const Icon = getTemplateIcon(tpl.name);
+            return (
+              <div
+                key={tpl.id}
+                onClick={() => handleStartReflection(tpl)}
+                className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all cursor-pointer flex flex-col justify-between space-y-5 group"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center">
+                      <Icon className="w-4 h-4" />
+                    </div>
+
+                    {!tpl.is_default && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm('Delete this custom reflection template?')) {
+                            deleteTemplate(tpl.id);
+                          }
+                        }}
+                        className="p-1 rounded text-[var(--text-tertiary)] hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Delete template"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div>
+                    <h3 className="font-editorial text-2xl font-medium text-[var(--text-primary)] group-hover:text-[var(--accent-olive)] transition-colors">
+                      {tpl.name}
+                    </h3>
+                    {tpl.description && (
+                      <p className="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
+                        {tpl.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5 pt-2">
+                    {tpl.prompts.map((prompt, idx) => (
+                      <div key={idx} className="text-xs text-[var(--text-secondary)] flex items-start gap-2">
+                        <span className="text-[var(--accent-olive)] font-bold">•</span>
+                        <span className="italic leading-snug">{prompt}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="space-y-1 pt-1">
-                  {tpl.prompts.map((p, idx) => (
-                    <div key={idx} className="text-[11px] text-[var(--text-tertiary)] flex items-start gap-1.5">
-                      <span className="text-[var(--accent-olive)]">•</span>
-                      <span className="italic">{p}</span>
+                <div className="pt-2 flex items-center gap-1.5 text-xs text-[var(--accent-olive)] font-medium">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Start reflection session</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform ml-auto" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Modal: Create Custom Reflection Template */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-lg p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between">
+              <h3 className="font-editorial text-2xl font-medium text-[var(--text-primary)]">
+                Create Reflection Template
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-1 rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
+                  Template Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Monthly Perspective Shift, Creative Project Audit"
+                  className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] focus:border-[var(--accent-olive)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
+                  Description (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Briefly state when this reflection is useful"
+                  className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] focus:border-[var(--accent-olive)] rounded-xl px-3.5 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-[var(--text-secondary)]">
+                  Prompt Questions
+                </label>
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {prompts.map((p, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="text-xs text-[var(--text-tertiary)] w-4 text-right">
+                        {idx + 1}.
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={p}
+                        onChange={(e) => handlePromptChange(idx, e.target.value)}
+                        placeholder="e.g. What unexpected insight surfaced recently?"
+                        className="flex-1 bg-[var(--bg-base)] border border-[var(--border-subtle)] focus:border-[var(--accent-olive)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none"
+                      />
+                      {prompts.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePromptField(idx)}
+                          className="p-1 text-[var(--text-tertiary)] hover:text-rose-500 cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddPromptField}
+                  className="text-xs text-[var(--accent-olive)] hover:underline flex items-center gap-1 font-medium pt-1 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add another question</span>
+                </button>
               </div>
 
-              <div className="pt-2 flex items-center gap-1 text-xs text-[var(--accent-olive)] font-medium">
-                <span>Start reflection</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              <div className="pt-3 flex justify-end gap-2 border-t border-[var(--border-subtle)]">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium shadow-xs transition-colors cursor-pointer"
+                >
+                  Create template
+                </button>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

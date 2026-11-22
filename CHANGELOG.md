@@ -2,6 +2,20 @@
 
 All notable changes to the Qalbanion project will be documented in this file.
 
+## [0.5.0] - Phase 8 & Phase 9: Guided Reflections, Analytics & Thought Evolution
+
+### Added
+- **Guided Reflection Engine (`src/hooks/useReflections.ts` & `src/pages/ReflectionsPage.tsx`)**:
+  - Pre-built templates for Daily, Weekly, Decision, and Experience reflections.
+  - Interactive creator allowing users to design and delete custom reflection templates with custom prompt questions.
+  - Structured session starter that formats prompts directly into TipTap rich-text editor headings.
+- **Insights & Thought Evolution (`src/pages/InsightsPage.tsx`)**:
+  - Live activity stats: total entries, total words, average words/entry, and writing distribution breakdown (journals vs thoughts vs reflections).
+  - Visual monthly activity trend bar chart.
+  - Interactive Thought Evolution comparison tool enabling side-by-side review of past thoughts vs recent perspectives.
+  - Unresolved Questions repository filtering thoughts with open inquiries to revisit.
+  - Insight integrity notice safeguarding against fabricated analytics.
+
 ## [0.4.0] - Phase 6 & Phase 7: Collections, Tags, Timeline & "On This Day"
 
 ### Added

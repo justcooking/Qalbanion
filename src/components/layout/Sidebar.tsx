@@ -16,6 +16,7 @@ import {
   LogOut,
   User as UserIcon,
   Download,
+  Search,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -23,13 +24,17 @@ import { usePWAInstall } from '../../hooks/usePWAInstall';
 
 interface SidebarProps {
   onNewEntry?: () => void;
+  onOpenPalette?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, profile, signOut } = useAuth();
   const { isInstallable, installApp } = usePWAInstall();
   const navigate = useNavigate();
+
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
+  const modKey = isMac ? '⌘' : 'Ctrl';
 
   const handleQuickNew = () => {
     if (onNewEntry) {
@@ -72,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
       </div>
 
       {/* Primary Write Button */}
-      <div className="mb-6 flex justify-center lg:px-1">
+      <div className="mb-3 flex justify-center lg:px-1">
         <button
           onClick={handleQuickNew}
           title="Write a thought"
@@ -80,6 +85,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
         >
           <PenTool className="w-4 h-4 shrink-0" />
           <span className="hidden lg:inline">Write a thought</span>
+        </button>
+      </div>
+
+      {/* Quick Search / Command Palette Trigger */}
+      <div className="mb-5 flex justify-center lg:px-1">
+        <button
+          type="button"
+          onClick={onOpenPalette}
+          title={`Search thoughts or run commands (${modKey}+K)`}
+          className="w-10 h-10 lg:w-full lg:h-auto flex items-center justify-between lg:px-3 lg:py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:border-[var(--accent-olive)]/60 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer group"
+        >
+          <div className="flex items-center gap-2.5 mx-auto lg:mx-0">
+            <Search className="w-3.5 h-3.5 text-[var(--text-tertiary)] group-hover:text-[var(--accent-olive)] transition-colors shrink-0" />
+            <span className="hidden lg:inline text-xs">Search or jump to...</span>
+          </div>
+          <kbd className="hidden lg:inline text-[10px] font-sans px-1.5 py-0.5 rounded border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-tertiary)]">
+            {modKey} K
+          </kbd>
         </button>
       </div>
 

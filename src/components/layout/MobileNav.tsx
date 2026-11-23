@@ -18,12 +18,17 @@ import {
   User as UserIcon,
   Download,
   MoreHorizontal,
+  Search,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePWAInstall } from '../../hooks/usePWAInstall';
 
-export const MobileNav: React.FC = () => {
+interface MobileNavProps {
+  onOpenPalette?: () => void;
+}
+
+export const MobileNav: React.FC<MobileNavProps> = ({ onOpenPalette }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { user, profile, signOut } = useAuth();
@@ -72,6 +77,15 @@ export const MobileNav: React.FC = () => {
           {/* Action Buttons */}
           <div className="flex items-center gap-1">
             <button
+              onClick={onOpenPalette}
+              className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
+              aria-label="Search thoughts or jump to"
+              title="Search thoughts or commands"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+
+            <button
               onClick={toggleTheme}
               className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
               aria-label="Toggle theme"
@@ -93,13 +107,27 @@ export const MobileNav: React.FC = () => {
         {isOpen && (
           <div className="fixed inset-0 top-[53px] bg-[var(--bg-base)] z-50 p-5 flex flex-col justify-between overflow-y-auto animate-in fade-in duration-150">
             <div className="space-y-4">
-              <button
-                onClick={handleWriteClick}
-                className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl bg-[var(--accent-olive)] text-white font-medium text-base shadow-sm cursor-pointer active:scale-[0.99] transition-transform"
-              >
-                <PenTool className="w-4 h-4" />
-                <span>Write a thought</span>
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={handleWriteClick}
+                  className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl bg-[var(--accent-olive)] text-white font-medium text-base shadow-sm cursor-pointer active:scale-[0.99] transition-transform"
+                >
+                  <PenTool className="w-4 h-4" />
+                  <span>Write a thought</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (onOpenPalette) onOpenPalette();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                >
+                  <Search className="w-4 h-4 text-[var(--accent-olive)]" />
+                  <span>Search thoughts, collections, commands...</span>
+                </button>
+              </div>
 
               <nav className="space-y-1 pt-1">
                 {navItems.map((item) => {

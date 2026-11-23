@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -14,6 +14,9 @@ interface TipTapEditorProps {
   onChange: (json: Record<string, unknown>, text: string, wordCount: number) => void;
   placeholder?: string;
   editable?: boolean;
+  isTypewriterMode?: boolean;
+  onToggleTypewriter?: () => void;
+  onOpenShortcuts?: () => void;
 }
 
 export const TipTapEditor: React.FC<TipTapEditorProps> = ({
@@ -21,7 +24,12 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
   onChange,
   placeholder = 'What is on your mind? Begin writing freely...',
   editable = true,
+  isTypewriterMode = false,
+  onToggleTypewriter,
+  onOpenShortcuts,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const editor = useEditor({
     editable,
     extensions: [
@@ -72,16 +80,81 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
     }
   }, [editor, initialContent]);
 
+  // Smooth Typewriter Scrolling Engine
+  useEffect(() => {
+    if (!editor || !isTypewriterMode) return;
+
+    let rAFId: number | null = null;
+
+    const handleCaretScroll = () => {
+      if (rAFId) cancelAnimationFrame(rAFId);
+
+      rAFId = requestAnimationFrame(() => {
+        try {
+          if (!editor.isFocused) return;
+          const { from } = editor.state.selection;
+          const coords = editor.view.coordsAtPos(from);
+          if (!coords) return;
+
+          // Ideal focal line: 42% from top of viewport
+          const targetY = window.innerHeight * 0.42;
+          const diff = coords.top - targetY;
+
+          // Only scroll if deviation is noticeable to eliminate micro-jitter
+          if (Math.abs(diff) > 22) {
+            // Find closest scrollable ancestor
+            let parent: HTMLElement | null = containerRef.current;
+            let scrollable: HTMLElement | Window = window;
+
+            while (parent) {
+              const overflowY = window.getComputedStyle(parent).overflowY;
+              if (
+                (overflowY === 'auto' || overflowY === 'scroll') &&
+                parent.scrollHeight > parent.clientHeight
+              ) {
+                scrollable = parent;
+                break;
+              }
+              parent = parent.parentElement;
+            }
+
+            if (scrollable === window) {
+              window.scrollBy({ top: diff, behavior: 'smooth' });
+            } else {
+              (scrollable as HTMLElement).scrollBy({ top: diff, behavior: 'smooth' });
+            }
+          }
+        } catch {
+          // Caret coords not available yet
+        }
+      });
+    };
+
+    editor.on('selectionUpdate', handleCaretScroll);
+    editor.on('transaction', handleCaretScroll);
+
+    return () => {
+      if (rAFId) cancelAnimationFrame(rAFId);
+      editor.off('selectionUpdate', handleCaretScroll);
+      editor.off('transaction', handleCaretScroll);
+    };
+  }, [editor, isTypewriterMode]);
+
   return (
-    <div className="space-y-3 relative">
+    <div ref={containerRef} className="space-y-3 relative">
       {editable && (
         <>
-          <EditorToolbar editor={editor} />
+          <EditorToolbar
+            editor={editor}
+            isTypewriterMode={isTypewriterMode}
+            onToggleTypewriter={onToggleTypewriter}
+            onOpenShortcuts={onOpenShortcuts}
+          />
           <FloatingBubbleMenu editor={editor} />
           <SlashCommandMenu editor={editor} />
         </>
       )}
-      <div className="pt-2">
+      <div className={`pt-2 transition-all duration-300 ${isTypewriterMode ? 'pb-[45vh]' : ''}`}>
         <EditorContent editor={editor} />
       </div>
     </div>

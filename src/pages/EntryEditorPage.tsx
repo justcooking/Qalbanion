@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useJournal, type SyncStatus } from '../hooks/useJournal';
 import { useCollections } from '../hooks/useCollections';
 import { TipTapEditor } from '../components/editor/TipTapEditor';
+import { KeyboardShortcutsModal } from '../components/editor/KeyboardShortcutsModal';
 import type { JournalEntry, EntryType, MoodType } from '../types/journal';
 import {
   ArrowLeft,
@@ -23,6 +24,8 @@ import {
   Copy,
   CheckCheck,
   Columns,
+  AlignCenter,
+  Keyboard,
 } from 'lucide-react';
 
 export const EntryEditorPage: React.FC = () => {
@@ -93,18 +96,29 @@ export const EntryEditorPage: React.FC = () => {
   const [isWide, setIsWide] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
-  // Escape key exits focus mode
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isFocusMode) {
-        setIsFocusMode(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFocusMode]);
+  // Typewriter Scrolling & Shortcuts Guide States
+  const [isTypewriterMode, setIsTypewriterMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('qalbanion_typewriter_mode') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState<boolean>(false);
 
-  const handleCopyContent = async () => {
+  const handleToggleTypewriter = useCallback(() => {
+    setIsTypewriterMode((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('qalbanion_typewriter_mode', String(next));
+      } catch {
+        // fallback
+      }
+      return next;
+    });
+  }, []);
+
+  const handleCopyContent = useCallback(async () => {
     try {
       const fullContent = title ? `# ${title}\n\n${contentText}` : contentText;
       await navigator.clipboard.writeText(fullContent);
@@ -113,7 +127,50 @@ export const EntryEditorPage: React.FC = () => {
     } catch {
       // fallback
     }
-  };
+  }, [title, contentText]);
+
+  // Global Keyboard Shortcuts (Escape, Ctrl+/, Alt+T, Alt+Z, Alt+W, Alt+C)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Shortcuts Modal Toggle: Ctrl+/ or Cmd+/
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        setIsShortcutsOpen((prev) => !prev);
+        return;
+      }
+
+      // 2. Escape closes active modal or exits Zen mode
+      if (e.key === 'Escape') {
+        if (isShortcutsOpen) {
+          setIsShortcutsOpen(false);
+          return;
+        }
+        if (isFocusMode) {
+          setIsFocusMode(false);
+          return;
+        }
+      }
+
+      // 3. Alt shortcuts
+      if (e.altKey) {
+        if (e.key === 't' || e.key === 'T') {
+          e.preventDefault();
+          handleToggleTypewriter();
+        } else if (e.key === 'z' || e.key === 'Z') {
+          e.preventDefault();
+          setIsFocusMode((prev) => !prev);
+        } else if (e.key === 'w' || e.key === 'W') {
+          e.preventDefault();
+          setIsWide((prev) => !prev);
+        } else if (e.key === 'c' || e.key === 'C') {
+          e.preventDefault();
+          handleCopyContent();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFocusMode, isShortcutsOpen, handleToggleTypewriter, handleCopyContent]);
 
   // Load existing entry if editing
   useEffect(() => {
@@ -291,14 +348,35 @@ export const EntryEditorPage: React.FC = () => {
     >
       {/* Zen Mode Exit Floating Pill */}
       {isFocusMode && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-1.5 bg-[var(--bg-surface)]/95 backdrop-blur-md p-1 rounded-full border border-[var(--border-subtle)] shadow-md select-none">
+          <button
+            type="button"
+            onClick={handleToggleTypewriter}
+            title={isTypewriterMode ? 'Typewriter Mode Active (Alt+T)' : 'Typewriter Scrolling (Alt+T)'}
+            className={`p-1.5 rounded-full text-xs transition-colors cursor-pointer ${
+              isTypewriterMode
+                ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)]'
+                : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <AlignCenter className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsShortcutsOpen(true)}
+            title="Keyboard Shortcuts & Flow (Ctrl+/)"
+            className="p-1.5 rounded-full text-xs text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          >
+            <Keyboard className="w-3.5 h-3.5" />
+          </button>
+          <div className="w-[1px] h-3.5 bg-[var(--border-subtle)]" />
           <button
             type="button"
             onClick={() => setIsFocusMode(false)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-sm cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer font-medium"
           >
-            <Minimize2 className="w-3.5 h-3.5" />
-            <span>Exit Zen Mode (Esc)</span>
+            <Minimize2 className="w-3.5 h-3.5 text-[var(--accent-olive)]" />
+            <span>Exit Zen (Esc)</span>
           </button>
         </div>
       )}
@@ -360,11 +438,39 @@ export const EntryEditorPage: React.FC = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-0.5 sm:gap-1">
+              {/* Typewriter Scrolling Toggle */}
+              <button
+                type="button"
+                onClick={handleToggleTypewriter}
+                title={
+                  isTypewriterMode
+                    ? 'Typewriter Mode Active (Alt+T)'
+                    : 'Typewriter Scrolling (Alt+T)'
+                }
+                className={`p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                  isTypewriterMode
+                    ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] border border-[var(--accent-olive)]'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <AlignCenter className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Shortcuts Modal Trigger */}
+              <button
+                type="button"
+                onClick={() => setIsShortcutsOpen(true)}
+                title="Keyboard Shortcuts & Flow (Ctrl+/)"
+                className="p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+              >
+                <Keyboard className="w-3.5 h-3.5" />
+              </button>
+
               {/* Width toggle (hidden on small phone screens) */}
               <button
                 type="button"
                 onClick={() => setIsWide(!isWide)}
-                title={isWide ? 'Comfortable reading width' : 'Wide writing canvas'}
+                title={isWide ? 'Comfortable reading width' : 'Wide writing canvas (Alt+W)'}
                 className="hidden sm:flex p-1.5 min-w-[34px] min-h-[34px] items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 <Columns className="w-3.5 h-3.5" />
@@ -374,7 +480,7 @@ export const EntryEditorPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleCopyContent}
-                title="Copy markdown to clipboard"
+                title="Copy markdown to clipboard (Alt+C)"
                 className="p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 {isCopied ? (
@@ -388,7 +494,7 @@ export const EntryEditorPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsFocusMode(!isFocusMode)}
-                title={isFocusMode ? 'Exit Zen Mode (Esc)' : 'Zen Focus Mode (F)'}
+                title={isFocusMode ? 'Exit Zen Mode (Esc)' : 'Zen Focus Mode (Alt+Z)'}
                 className="p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 {isFocusMode ? (
@@ -473,6 +579,9 @@ export const EntryEditorPage: React.FC = () => {
         <TipTapEditor
           initialContent={contentJson}
           onChange={handleEditorUpdate}
+          isTypewriterMode={isTypewriterMode}
+          onToggleTypewriter={handleToggleTypewriter}
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
           placeholder={
             entryType === 'thought'
               ? 'Capture a quick thought or idea without pressure...'
@@ -608,6 +717,77 @@ export const EntryEditorPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Floating Bottom Companion HUD */}
+      <div className="fixed bottom-5 right-5 z-40 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-surface)]/95 backdrop-blur-md border border-[var(--border-subtle)] shadow-lg select-none text-xs text-[var(--text-secondary)]">
+        <span className="font-mono text-[11px] font-medium text-[var(--text-tertiary)] px-1">
+          {wordCount}w · {readingTime}m
+        </span>
+
+        <div className="w-[1px] h-3.5 bg-[var(--border-subtle)] mx-0.5" />
+
+        {/* Typewriter Toggle */}
+        <button
+          type="button"
+          onClick={handleToggleTypewriter}
+          title={isTypewriterMode ? 'Typewriter Scrolling Active (Alt+T)' : 'Typewriter Scrolling (Alt+T)'}
+          className={`p-1 rounded-full transition-colors cursor-pointer ${
+            isTypewriterMode
+              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)]'
+              : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+          }`}
+        >
+          <AlignCenter className="w-3.5 h-3.5" />
+        </button>
+
+        {/* Shortcuts Trigger */}
+        <button
+          type="button"
+          onClick={() => setIsShortcutsOpen(true)}
+          title="Keyboard Shortcuts Guide (Ctrl+/)"
+          className="p-1 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+        >
+          <Keyboard className="w-3.5 h-3.5" />
+        </button>
+
+        {/* Quick Markdown Copy */}
+        <button
+          type="button"
+          onClick={handleCopyContent}
+          title="Copy markdown to clipboard (Alt+C)"
+          className="p-1 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+        >
+          {isCopied ? (
+            <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+          ) : (
+            <Copy className="w-3.5 h-3.5" />
+          )}
+        </button>
+
+        {/* Zen Mode Toggle */}
+        <button
+          type="button"
+          onClick={() => setIsFocusMode(!isFocusMode)}
+          title={isFocusMode ? 'Exit Zen Mode (Esc)' : 'Zen Focus Retreat (Alt+Z)'}
+          className={`p-1 rounded-full transition-colors cursor-pointer ${
+            isFocusMode
+              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)]'
+              : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+          }`}
+        >
+          {isFocusMode ? (
+            <Minimize2 className="w-3.5 h-3.5" />
+          ) : (
+            <Maximize2 className="w-3.5 h-3.5" />
+          )}
+        </button>
+      </div>
+
+      {/* Keyboard Shortcuts Modal */}
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
+      />
     </div>
   );
 };

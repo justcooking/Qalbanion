@@ -21,6 +21,8 @@ import {
   Highlighter,
   Palette,
   Minus,
+  AlignCenter,
+  Keyboard,
 } from 'lucide-react';
 import { useTypography } from '../../contexts/TypographyContext';
 import {
@@ -32,9 +34,17 @@ import {
 
 interface EditorToolbarProps {
   editor: Editor | null;
+  isTypewriterMode?: boolean;
+  onToggleTypewriter?: () => void;
+  onOpenShortcuts?: () => void;
 }
 
-export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
+export const EditorToolbar: React.FC<EditorToolbarProps> = ({
+  editor,
+  isTypewriterMode,
+  onToggleTypewriter,
+  onOpenShortcuts,
+}) => {
   // Popover states
   const [isFontMenuOpen, setIsFontMenuOpen] = useState(false);
   const [isSizeDropdownOpen, setIsSizeDropdownOpen] = useState(false);
@@ -406,6 +416,23 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         'Redo (Ctrl+Y)',
         !editor.can().redo()
       )}
+
+      {/* Flow: Typewriter & Keyboard Shortcuts */}
+      {onToggleTypewriter &&
+        toolButton(
+          onToggleTypewriter,
+          !!isTypewriterMode,
+          <AlignCenter className="w-3.5 h-3.5" />,
+          'Typewriter scrolling (Alt+T)'
+        )}
+
+      {onOpenShortcuts &&
+        toolButton(
+          onOpenShortcuts,
+          false,
+          <Keyboard className="w-3.5 h-3.5" />,
+          'Keyboard shortcuts (Ctrl+/)'
+        )}
 
       {/* 7. Global Typography & Overall Font Size Picker */}
       <div className="relative shrink-0 sm:ml-auto" ref={fontMenuRef}>

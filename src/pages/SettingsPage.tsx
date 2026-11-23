@@ -194,21 +194,21 @@ export const SettingsPage: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface-elevated)]/80 text-xs font-medium text-[var(--text-primary)] transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-[var(--accent-olive)]" />
-              <span>Export Complete JSON Backup</span>
+              <span>Export Full Archive (.json)</span>
             </button>
           </div>
         </section>
 
-        {/* Local Persistence Status */}
+        {/* Offline & Local Storage */}
         <section className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-2">
           <div className="flex items-center gap-2">
             <HardDrive className="w-4 h-4 text-[var(--accent-olive)]" />
             <h2 className="font-editorial text-xl font-medium text-[var(--text-primary)]">
-              Local Persistence & Offline Cache
+              Offline Writing & Storage
             </h2>
           </div>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-            IndexedDB storage is active. Your journal is cached locally so you can read and write without an internet connection. Changes sync to Supabase when reconnected.
+            Your journal is stored securely on this device so you can write freely anywhere, even without internet. When connected, your entries sync quietly and seamlessly.
           </p>
         </section>
 
@@ -216,7 +216,7 @@ export const SettingsPage: React.FC = () => {
         <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)] pt-2">
           <ShieldCheck className="w-4 h-4 text-[var(--accent-olive)] shrink-0" />
           <span>
-            Qalbanion enforces strict multi-tenant Row Level Security (RLS) on all user data.
+            Your journal is completely private. Only you have access to your personal thoughts and reflections.
           </span>
         </div>
       </div>

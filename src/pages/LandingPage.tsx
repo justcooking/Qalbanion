@@ -160,7 +160,7 @@ export const LandingPage: React.FC = () => {
                 2. Never Lose a Word
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Keystroke-level offline autosave via your browser's local IndexedDB database. Write without internet; your changes sync quietly when reconnected.
+                Every word is automatically saved as you write. You can write seamlessly offline without internet; your reflections sync quietly whenever you're back online.
               </p>
             </div>
 
@@ -184,7 +184,7 @@ export const LandingPage: React.FC = () => {
                 4. Private & Truly Yours
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                No advertising, no tracking, no selling data. Export your entire journal anytime to Markdown, Plain Text, or JSON with zero vendor lock-in.
+                No advertising, no tracking, and no selling data. Export your entire journal anytime to keep your words forever, with full ownership and zero lock-in.
               </p>
             </div>
           </div>

@@ -75,7 +75,7 @@ export const AIWorkspaceModal: React.FC<AIWorkspaceModalProps> = ({
                 AI Reflection Assistant
               </h3>
               <p className="text-xs text-[var(--text-tertiary)]">
-                Selective, user-authorized cognitive discovery.
+                Thoughtful perspectives on your chosen entries.
               </p>
             </div>
           </div>
@@ -93,10 +93,10 @@ export const AIWorkspaceModal: React.FC<AIWorkspaceModalProps> = ({
           <div className="p-4 rounded-xl bg-[var(--accent-olive-soft)]/50 border border-[var(--accent-olive)]/20 text-xs text-[var(--text-secondary)] space-y-1.5">
             <div className="flex items-center gap-1.5 text-[var(--accent-olive-text)] font-medium">
               <ShieldCheck className="w-4 h-4" />
-              <span>Strict Data Boundary (Part 11 Compliance)</span>
+              <span>Private & Selective by Design</span>
             </div>
             <p className="leading-relaxed">
-              Qalbanion never scans your entire journal automatically. Only the specific entries you hand-select below will be inspected. Analysis is processed locally and privately on your device.
+              Qalbanion never scans your entire journal automatically. Only the specific entries you hand-select below will be analyzed to help you reflect on recurring thoughts and questions.
             </p>
           </div>
 

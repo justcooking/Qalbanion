@@ -223,7 +223,7 @@ export const HomePage: React.FC = () => {
               Begin your first journal entry
             </h3>
             <p className="text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
-              Click here to write your first personal thought. It autosaves keystroke-by-keystroke to your local database and syncs securely to your cloud account.
+              Click here to write your first personal thought. Your words are saved automatically as you write, keeping your journal safe and private.
             </p>
           </div>
         ) : (

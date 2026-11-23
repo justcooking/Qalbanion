@@ -176,9 +176,8 @@ export const MobileNav: React.FC = () => {
                 </NavLink>
               )}
 
-              <div className="text-[11px] text-[var(--text-tertiary)] flex justify-between items-center px-1">
+              <div className="text-[11px] text-[var(--text-tertiary)] text-center px-1">
                 <span>A companion for your heart.</span>
-                <span className="font-mono">v1.0.0</span>
               </div>
             </div>
           </div>

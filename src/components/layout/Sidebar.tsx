@@ -163,12 +163,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry }) => {
 
         {/* Status Pill */}
         <div
-          title={user ? 'Cloud sync active' : 'Ready locally'}
+          title={user ? 'Synced' : 'Saved on this device'}
           className="flex items-center justify-center lg:justify-between p-2 lg:px-3 lg:py-1.5 rounded-lg bg-[var(--bg-surface-elevated)] text-xs text-[var(--text-tertiary)]"
         >
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
-            <span className="hidden lg:inline">{user ? 'Cloud sync active' : 'Ready locally'}</span>
+            <span className="hidden lg:inline">{user ? 'Synced' : 'Saved'}</span>
           </div>
           <CloudCheck className="w-3.5 h-3.5 shrink-0 hidden lg:inline" />
         </div>

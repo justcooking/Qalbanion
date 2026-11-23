@@ -8,8 +8,6 @@ import type { JournalEntry, EntryType, MoodType } from '../types/journal';
 import {
   ArrowLeft,
   Check,
-  Cloud,
-  CloudOff,
   Loader2,
   Smile,
   Star,
@@ -331,19 +329,19 @@ export const EntryEditorPage: React.FC = () => {
               {localSyncStatus === 'saved' && (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-emerald-700 dark:text-emerald-400 hidden sm:inline">Saved to cloud</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 hidden sm:inline">Saved</span>
                 </>
               )}
               {localSyncStatus === 'offline_saved' && (
                 <>
-                  <Cloud className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                  <span className="text-amber-700 dark:text-amber-400 hidden sm:inline">Saved locally</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-emerald-700 dark:text-emerald-400 hidden sm:inline">Saved</span>
                 </>
               )}
               {localSyncStatus === 'error' && (
                 <>
-                  <CloudOff className="w-3.5 h-3.5 text-rose-500" />
-                  <span className="text-rose-600 hidden sm:inline">Saved locally</span>
+                  <Check className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-amber-700 dark:text-amber-400 hidden sm:inline">Saved</span>
                 </>
               )}
             </div>
@@ -606,7 +604,7 @@ export const EntryEditorPage: React.FC = () => {
 
           <div className="flex items-center gap-1 text-[11px] text-[var(--text-tertiary)]">
             <Sparkles className="w-3 h-3 text-[var(--accent-olive)]" />
-            <span>Autosaves on every keystroke</span>
+            <span>Autosaved as you write</span>
           </div>
         </div>
       </div>

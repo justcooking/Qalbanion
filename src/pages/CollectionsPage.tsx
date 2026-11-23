@@ -83,17 +83,17 @@ export const CollectionsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-editorial text-4xl font-normal tracking-tight text-[var(--text-primary)]">
+          <h1 className="font-editorial text-3xl sm:text-4xl font-normal tracking-tight text-[var(--text-primary)]">
             Collections
           </h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
             Thematic streams to group thoughts without forcing rigid categorization.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-sm font-medium shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>New collection</span>
@@ -148,14 +148,14 @@ export const CollectionsPage: React.FC = () => {
                   </span>
                   <button
                     onClick={(e) => handleOpenEdit(col, e)}
-                    className="p-1 rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="p-1.5 rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-w-[28px] min-h-[28px] flex items-center justify-center cursor-pointer"
                     title="Edit collection"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={(e) => handleDelete(col.id, e)}
-                    className="p-1 rounded text-[var(--text-tertiary)] hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="p-1.5 rounded text-[var(--text-tertiary)] hover:text-rose-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-w-[28px] min-h-[28px] flex items-center justify-center cursor-pointer"
                     title="Delete collection"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

@@ -361,13 +361,13 @@ export const EntryEditorPage: React.FC = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1">
-              {/* Width toggle */}
+            <div className="flex items-center gap-0.5 sm:gap-1">
+              {/* Width toggle (hidden on small phone screens) */}
               <button
                 type="button"
                 onClick={() => setIsWide(!isWide)}
                 title={isWide ? 'Comfortable reading width' : 'Wide writing canvas'}
-                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                className="hidden sm:flex p-1.5 min-w-[34px] min-h-[34px] items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 <Columns className="w-3.5 h-3.5" />
               </button>
@@ -377,7 +377,7 @@ export const EntryEditorPage: React.FC = () => {
                 type="button"
                 onClick={handleCopyContent}
                 title="Copy markdown to clipboard"
-                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                className="p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 {isCopied ? (
                   <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
@@ -391,7 +391,7 @@ export const EntryEditorPage: React.FC = () => {
                 type="button"
                 onClick={() => setIsFocusMode(!isFocusMode)}
                 title={isFocusMode ? 'Exit Zen Mode (Esc)' : 'Zen Focus Mode (F)'}
-                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                className="p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 {isFocusMode ? (
                   <Minimize2 className="w-3.5 h-3.5 text-[var(--accent-olive)]" />
@@ -406,7 +406,7 @@ export const EntryEditorPage: React.FC = () => {
                   toggleFavourite(entryId);
                 }}
                 title={isFavourite ? 'Unfavourite' : 'Add to favourites'}
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                className={`p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                   isFavourite
                     ? 'text-amber-500 bg-amber-500/10'
                     : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
@@ -421,7 +421,7 @@ export const EntryEditorPage: React.FC = () => {
                   toggleArchive(entryId);
                 }}
                 title={isArchived ? 'Restore from archive' : 'Archive entry'}
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                className={`p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                   isArchived
                     ? 'text-[var(--accent-olive)] bg-[var(--accent-olive-soft)]'
                     : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
@@ -433,7 +433,7 @@ export const EntryEditorPage: React.FC = () => {
               <button
                 onClick={handleDelete}
                 title="Delete entry"
-                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-rose-500 transition-colors cursor-pointer"
+                className="p-1.5 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-rose-500 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -527,7 +527,7 @@ export const EntryEditorPage: React.FC = () => {
             </button>
 
             {isCollectionPickerOpen && (
-              <div className="absolute left-0 bottom-full mb-2 w-64 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg z-20 space-y-2 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute left-0 bottom-full mb-2 w-64 max-w-[calc(100vw-32px)] p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg z-20 space-y-2 animate-in fade-in zoom-in-95 duration-100">
                 <div className="flex items-center justify-between text-xs font-medium text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">
                   <span>Collections</span>
                   <button

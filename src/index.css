@@ -209,3 +209,23 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--border-strong);
 }
+
+/* Hide scrollbar for clean horizontal touch rails */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile Safe-Area utilities for modern iPhone/Android notches and home bars */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+}
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+}

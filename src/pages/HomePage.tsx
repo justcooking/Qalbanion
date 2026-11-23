@@ -79,23 +79,23 @@ export const HomePage: React.FC = () => {
     <div className="space-y-10 max-w-3xl mx-auto pb-12 animate-in fade-in duration-200">
       {/* 1. Welcoming Editorial Header */}
       <section className="space-y-2">
-        <h1 className="font-editorial text-4xl sm:text-5xl font-normal tracking-tight text-[var(--text-primary)]">
+        <h1 className="font-editorial text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-[var(--text-primary)]">
           {getGreeting()}.
         </h1>
-        <p className="text-[var(--text-secondary)] text-base font-light">
+        <p className="text-[var(--text-secondary)] text-sm sm:text-base font-light">
           A place to put your thoughts into words, and understand what they reveal over time.
         </p>
       </section>
 
       {/* 2. Prominent Quick-Entry Area */}
-      <section className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-xs transition-all">
+      <section className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-6 shadow-xs transition-all">
         <form onSubmit={handleQuickSubmit} className="space-y-4">
           <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)] font-medium">
             <span className="flex items-center gap-1.5 uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5 text-[var(--accent-olive)]" />
               Quick Thought
             </span>
-            <span>No title or tags required</span>
+            <span className="hidden sm:inline">No title or tags required</span>
           </div>
 
           <textarea
@@ -107,8 +107,8 @@ export const HomePage: React.FC = () => {
           />
 
           {/* Quick Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[var(--border-subtle)]">
-            <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[var(--border-subtle)]">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll py-1">
               <span className="text-xs text-[var(--text-tertiary)] mr-1 flex items-center gap-1 shrink-0">
                 <Smile className="w-3.5 h-3.5" />
                 Mood:
@@ -118,7 +118,7 @@ export const HomePage: React.FC = () => {
                   key={m.label}
                   type="button"
                   onClick={() => setSelectedMood(selectedMood === m.label ? null : m.label)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 min-h-[30px] ${
                     selectedMood === m.label
                       ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)]'
                       : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
@@ -130,7 +130,7 @@ export const HomePage: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center justify-end gap-2 sm:ml-auto">
               <button
                 type="button"
                 onClick={() =>
@@ -138,7 +138,7 @@ export const HomePage: React.FC = () => {
                     state: { initialContent: quickThought, initialMood: selectedMood },
                   })
                 }
-                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3 py-1.5 rounded-lg hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer"
+                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3 py-1.5 rounded-lg hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-h-[34px]"
               >
                 Open full editor
               </button>
@@ -146,7 +146,7 @@ export const HomePage: React.FC = () => {
               <button
                 type="submit"
                 disabled={!quickThought.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs min-h-[34px]"
               >
                 <span>Save</span>
                 <Send className="w-3 h-3" />

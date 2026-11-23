@@ -122,16 +122,19 @@ export const FloatingBubbleMenu: React.FC<FloatingBubbleMenuProps> = ({ editor }
     { hex: 'rgba(224, 242, 254, 0.55)', label: 'Sky' },
   ];
 
+  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 400;
+  const safeLeft = Math.min(Math.max(140, coords.left), screenWidth - 140);
+
   return (
     <div
       ref={menuRef}
       style={{
         position: 'fixed',
         top: `${Math.max(12, coords.top)}px`,
-        left: `${coords.left}px`,
+        left: `${safeLeft}px`,
         transform: 'translateX(-50%)',
       }}
-      className="z-50 flex items-center gap-0.5 p-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 backdrop-blur-md shadow-xl animate-in fade-in zoom-in-95 duration-100 select-none"
+      className="z-50 flex items-center gap-0.5 p-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 backdrop-blur-md shadow-xl animate-in fade-in zoom-in-95 duration-100 select-none max-w-[calc(100vw-24px)] overflow-x-auto no-scrollbar"
     >
       {/* Bold, Italic, Underline, Strike, Code */}
       <button

@@ -32,12 +32,12 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200 flex flex-col justify-between selection:bg-[var(--accent-olive)]/20">
       {/* 1. Header Navigation */}
-      <header className="max-w-5xl w-full mx-auto px-6 py-6 flex items-center justify-between">
+      <header className="max-w-5xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center border border-[var(--border-subtle)] group-hover:scale-105 transition-transform">
             <Feather className="w-4 h-4" />
           </div>
-          <span className="font-editorial text-2xl font-medium tracking-tight text-[var(--text-primary)]">
+          <span className="font-editorial text-xl sm:text-2xl font-medium tracking-tight text-[var(--text-primary)]">
             Qalbanion
           </span>
         </Link>
@@ -87,7 +87,7 @@ export const LandingPage: React.FC = () => {
             <span>A Companion for Your Heart</span>
           </div>
 
-          <h1 className="font-editorial text-5xl sm:text-6xl md:text-7xl font-normal tracking-tight text-[var(--text-primary)] leading-[1.1]">
+          <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-[var(--text-primary)] leading-[1.1]">
             A place to put your thoughts into words.
           </h1>
 

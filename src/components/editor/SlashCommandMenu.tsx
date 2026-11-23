@@ -207,15 +207,19 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({ editor }) =>
 
   if (!isOpen || !coords || filteredCommands.length === 0) return null;
 
+  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 400;
+  const menuWidth = Math.min(288, screenWidth - 24);
+  const safeLeft = Math.min(Math.max(12, coords.left), screenWidth - menuWidth - 12);
+
   return (
     <div
       ref={menuRef}
       style={{
         position: 'fixed',
         top: `${coords.top}px`,
-        left: `${coords.left}px`,
+        left: `${safeLeft}px`,
       }}
-      className="z-50 w-72 max-h-80 overflow-y-auto p-1.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 backdrop-blur-md shadow-2xl space-y-0.5 animate-in fade-in zoom-in-95 duration-100 select-none"
+      className="z-50 w-72 max-w-[calc(100vw-24px)] max-h-80 overflow-y-auto p-1.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 backdrop-blur-md shadow-2xl space-y-0.5 animate-in fade-in zoom-in-95 duration-100 select-none"
     >
       <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] flex items-center justify-between border-b border-[var(--border-subtle)] mb-1">
         <span>Insert block</span>

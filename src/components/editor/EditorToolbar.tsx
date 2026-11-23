@@ -110,7 +110,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
       disabled={disabled}
       title={title}
       aria-label={title}
-      className={`p-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+      className={`p-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0 min-w-[34px] min-h-[34px] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed ${
         isActive
           ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] border border-[var(--accent-olive)]'
           : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border border-transparent'
@@ -150,7 +150,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
   ];
 
   return (
-    <div className="flex flex-wrap items-center gap-1 p-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-xs select-none sticky top-2 z-10 backdrop-blur-md">
+    <div className="flex items-center sm:flex-wrap gap-1 p-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 shadow-xs select-none sticky top-2 z-20 backdrop-blur-md overflow-x-auto sm:overflow-visible no-scrollbar touch-scroll">
       {/* 1. Basic Text Formatting */}
       {toolButton(
         () => editor.chain().focus().toggleBold().run(),
@@ -183,10 +183,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         'Inline code'
       )}
 
-      <div className="w-[1px] h-4 bg-[var(--border-subtle)] mx-0.5" />
+      <div className="w-[1px] h-4 bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
       {/* 2. Selected Text Font Size Selector */}
-      <div className="relative" ref={sizeMenuRef}>
+      <div className="relative shrink-0" ref={sizeMenuRef}>
         <button
           type="button"
           onClick={() => setIsSizeDropdownOpen(!isSizeDropdownOpen)}
@@ -235,11 +235,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
       </div>
 
       {/* 3. Text Color & Highlight Dropdowns */}
-      <div className="relative" ref={colorMenuRef}>
+      <div className="relative shrink-0" ref={colorMenuRef}>
         <button
           type="button"
           onClick={() => setIsColorDropdownOpen(!isColorDropdownOpen)}
-          className={`p-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
+          className={`p-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer border shrink-0 min-w-[34px] min-h-[34px] flex items-center justify-center ${
             isColorDropdownOpen || editor.isActive('textColor')
               ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] border-[var(--accent-olive)]'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border-transparent'
@@ -250,7 +250,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         </button>
 
         {isColorDropdownOpen && (
-          <div className="absolute left-0 top-full mt-1.5 w-44 p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg z-50 space-y-1 animate-in fade-in duration-100">
+          <div className="absolute left-0 top-full mt-1.5 w-44 max-w-[calc(100vw-32px)] p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg z-50 space-y-1 animate-in fade-in duration-100">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] block px-1">
               Text Color
             </span>
@@ -281,11 +281,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         )}
       </div>
 
-      <div className="relative" ref={highlightMenuRef}>
+      <div className="relative shrink-0" ref={highlightMenuRef}>
         <button
           type="button"
           onClick={() => setIsHighlightDropdownOpen(!isHighlightDropdownOpen)}
-          className={`p-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
+          className={`p-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer border shrink-0 min-w-[34px] min-h-[34px] flex items-center justify-center ${
             isHighlightDropdownOpen || editor.isActive('textHighlight')
               ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] border-[var(--accent-olive)]'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border-transparent'
@@ -296,7 +296,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         </button>
 
         {isHighlightDropdownOpen && (
-          <div className="absolute left-0 top-full mt-1.5 w-44 p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg z-50 space-y-1 animate-in fade-in duration-100">
+          <div className="absolute left-0 top-full mt-1.5 w-44 max-w-[calc(100vw-32px)] p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg z-50 space-y-1 animate-in fade-in duration-100">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] block px-1">
               Highlight Color
             </span>
@@ -355,7 +355,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         'Heading 3'
       )}
 
-      <div className="w-[1px] h-4 bg-[var(--border-subtle)] mx-0.5" />
+      <div className="w-[1px] h-4 bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
       {/* 5. Lists & Blockquotes */}
       {toolButton(
@@ -389,7 +389,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         'Add link'
       )}
 
-      <div className="w-[1px] h-4 bg-[var(--border-subtle)] mx-0.5" />
+      <div className="w-[1px] h-4 bg-[var(--border-subtle)] mx-0.5 shrink-0" />
 
       {/* 6. History Undo/Redo */}
       {toolButton(
@@ -408,11 +408,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
       )}
 
       {/* 7. Global Typography & Overall Font Size Picker */}
-      <div className="relative ml-auto" ref={fontMenuRef}>
+      <div className="relative shrink-0 sm:ml-auto" ref={fontMenuRef}>
         <button
           type="button"
           onClick={() => setIsFontMenuOpen(!isFontMenuOpen)}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border shrink-0 min-h-[34px] ${
             isFontMenuOpen
               ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] border-[var(--accent-olive)]'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border-transparent'
@@ -427,7 +427,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
         </button>
 
         {isFontMenuOpen && (
-          <div className="absolute right-0 top-full mt-1.5 w-72 p-3.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-xl z-50 space-y-3.5 animate-in fade-in duration-100">
+          <div className="absolute right-0 top-full mt-1.5 w-72 max-w-[calc(100vw-32px)] p-3.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-xl z-50 space-y-3.5 animate-in fade-in duration-100">
             <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
               <div>
                 <span className="text-xs font-semibold text-[var(--text-primary)] block">

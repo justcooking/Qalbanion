@@ -73,19 +73,19 @@ export const InsightsPage: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-200 pb-16">
       {/* Header */}
       <div>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight text-[var(--text-primary)]">
+        <h1 className="font-editorial text-3xl sm:text-4xl font-normal tracking-tight text-[var(--text-primary)]">
           Insights
         </h1>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
+        <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
           Patterns, recurring themes, and the evolution of your thinking over time.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-xs font-medium select-none">
+      <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-xs font-medium select-none overflow-x-auto no-scrollbar touch-scroll whitespace-nowrap">
         <button
           onClick={() => setActiveTab('patterns')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 min-h-[34px] ${
             activeTab === 'patterns'
               ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-semibold shadow-xs'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -97,7 +97,7 @@ export const InsightsPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('evolution')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 min-h-[34px] ${
             activeTab === 'evolution'
               ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-semibold shadow-xs'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -109,7 +109,7 @@ export const InsightsPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('unresolved')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 min-h-[34px] ${
             activeTab === 'unresolved'
               ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-semibold shadow-xs'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'

@@ -109,10 +109,10 @@ export const JournalPage: React.FC = () => {
       {/* Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-editorial text-4xl font-normal tracking-tight text-[var(--text-primary)]">
+          <h1 className="font-editorial text-3xl sm:text-4xl font-normal tracking-tight text-[var(--text-primary)]">
             Journal
           </h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
             Chronological records of your thoughts, experiences, and observations.
           </p>
         </div>
@@ -146,7 +146,7 @@ export const JournalPage: React.FC = () => {
 
           <button
             onClick={() => navigate('/journal/new')}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-sm font-medium shadow-xs transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>New entry</span>
@@ -191,7 +191,7 @@ export const JournalPage: React.FC = () => {
         </div>
 
         {/* Filter Pills & Collection Filter */}
-        <div className="flex flex-wrap items-center gap-2 select-none">
+        <div className="flex items-center gap-2 select-none overflow-x-auto no-scrollbar touch-scroll pb-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -199,13 +199,13 @@ export const JournalPage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 min-h-[34px] ${
                   isActive
                     ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] border border-[var(--accent-olive)]'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border border-transparent'
                 }`}
               >
-                {Icon && <Icon className="w-3.5 h-3.5" />}
+                {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
                 <span>{tab.label}</span>
               </button>
             );

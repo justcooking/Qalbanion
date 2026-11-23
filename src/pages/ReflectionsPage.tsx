@@ -95,17 +95,17 @@ export const ReflectionsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-editorial text-4xl font-normal tracking-tight text-[var(--text-primary)]">
+          <h1 className="font-editorial text-3xl sm:text-4xl font-normal tracking-tight text-[var(--text-primary)]">
             Reflections
           </h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
             Deliberate prompt structures to examine choices, patterns, and questions. Never mandatory.
           </p>
         </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-sm font-medium shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>New template</span>
@@ -141,7 +141,7 @@ export const ReflectionsPage: React.FC = () => {
                             deleteTemplate(tpl.id);
                           }
                         }}
-                        className="p-1 rounded text-[var(--text-tertiary)] hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-1.5 rounded text-[var(--text-tertiary)] hover:text-rose-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-w-[28px] min-h-[28px] flex items-center justify-center cursor-pointer"
                         title="Delete template"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

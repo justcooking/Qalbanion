@@ -24,6 +24,10 @@ interface JournalContextType {
   saveEntry: (entry: JournalEntry, immediate?: boolean) => Promise<void>;
   loadEntry: (id: string) => Promise<JournalEntry | null>;
   deleteEntry: (id: string) => Promise<void>;
+  moveToTrash: (id: string) => Promise<void>;
+  restoreEntry: (id: string) => Promise<void>;
+  permanentlyDeleteEntry: (id: string) => Promise<void>;
+  emptyTrash: () => Promise<void>;
   toggleFavourite: (id: string) => Promise<void>;
   toggleArchive: (id: string) => Promise<void>;
   fetchEntries: () => Promise<JournalEntry[]>;
@@ -280,8 +284,38 @@ export const JournalProvider: React.FC<{ children: React.ReactNode }> = ({ child
     [entries, user, isOnline]
   );
 
-  // Delete an entry
-  const deleteEntry = useCallback(
+  // Soft delete: Move an entry to Trash with 30-day retention
+  const moveToTrash = useCallback(
+    async (id: string) => {
+      const entry = entries.find((e) => e.id === id);
+      if (!entry) return;
+      const updated: JournalEntry = {
+        ...entry,
+        status: 'trashed',
+        client_updated_at: new Date().toISOString(),
+      };
+      await saveEntry(updated, true);
+    },
+    [entries, saveEntry]
+  );
+
+  // Restore a trashed entry back to active status
+  const restoreEntry = useCallback(
+    async (id: string) => {
+      const entry = entries.find((e) => e.id === id);
+      if (!entry) return;
+      const updated: JournalEntry = {
+        ...entry,
+        status: 'active',
+        client_updated_at: new Date().toISOString(),
+      };
+      await saveEntry(updated, true);
+    },
+    [entries, saveEntry]
+  );
+
+  // Permanently delete an entry from local state, IndexedDB cache, and cloud
+  const permanentlyDeleteEntry = useCallback(
     async (id: string) => {
       // 1. Immediately remove from React state & local mirror
       setEntries((prev) => {
@@ -307,6 +341,22 @@ export const JournalProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     },
     [user]
+  );
+
+  // Empty all trashed entries
+  const emptyTrash = useCallback(async () => {
+    const trashed = entries.filter((e) => e.status === 'trashed');
+    for (const e of trashed) {
+      await permanentlyDeleteEntry(e.id);
+    }
+  }, [entries, permanentlyDeleteEntry]);
+
+  // Backward-compatible deleteEntry now safely routes to moveToTrash
+  const deleteEntry = useCallback(
+    async (id: string) => {
+      await moveToTrash(id);
+    },
+    [moveToTrash]
   );
 
   // Toggle Favourite
@@ -349,6 +399,10 @@ export const JournalProvider: React.FC<{ children: React.ReactNode }> = ({ child
         saveEntry,
         loadEntry,
         deleteEntry,
+        moveToTrash,
+        restoreEntry,
+        permanentlyDeleteEntry,
+        emptyTrash,
         toggleFavourite,
         toggleArchive,
         fetchEntries,

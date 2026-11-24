@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJournal } from '../hooks/useJournal';
 import { useCollections } from '../hooks/useCollections';
+import { useToast } from '../contexts/ToastContext';
 import {
   Search,
   Plus,
@@ -15,15 +16,18 @@ import {
   History,
   FolderTree,
   X,
+  Trash2,
+  RotateCcw,
 } from 'lucide-react';
 
 export const JournalPage: React.FC = () => {
   const navigate = useNavigate();
-  const { entries, isLoading, toggleFavourite } = useJournal();
+  const { entries, isLoading, toggleFavourite, restoreEntry, permanentlyDeleteEntry, emptyTrash } = useJournal();
   const { collections } = useCollections();
+  const { showToast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'thought' | 'journal' | 'reflection' | 'favourites' | 'archived'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'thought' | 'journal' | 'reflection' | 'favourites' | 'archived' | 'trash'>('all');
   const [viewMode, setViewMode] = useState<'feed' | 'timeline'>('feed');
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
 
@@ -34,6 +38,7 @@ export const JournalPage: React.FC = () => {
     { id: 'reflection', label: 'Reflections' },
     { id: 'favourites', label: 'Favourites', icon: Star },
     { id: 'archived', label: 'Archived', icon: Archive },
+    { id: 'trash', label: 'Trash', icon: Trash2 },
   ];
 
   // "On This Day" Detection: check if any entry was written on today's month and day (MM-DD)
@@ -58,7 +63,9 @@ export const JournalPage: React.FC = () => {
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
       // 1. Tab filter
-      if (activeTab === 'favourites') {
+      if (activeTab === 'trash') {
+        if (entry.status !== 'trashed') return false;
+      } else if (activeTab === 'favourites') {
         if (!entry.is_favourite || entry.status === 'trashed') return false;
       } else if (activeTab === 'archived') {
         if (entry.status !== 'archived') return false;
@@ -234,6 +241,33 @@ export const JournalPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Trash Retention Banner */}
+      {activeTab === 'trash' && (
+        <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5 text-[var(--text-secondary)]">
+            <Trash2 className="w-4 h-4 text-[var(--accent-olive)] shrink-0" />
+            <span>
+              Items in Trash are retained for 30 days before automatic removal. You can restore them anytime.
+            </span>
+          </div>
+          {filteredEntries.length > 0 && (
+            <button
+              type="button"
+              onClick={async () => {
+                if (window.confirm('Permanently delete all items in Trash? This cannot be undone.')) {
+                  await emptyTrash();
+                  showToast({ message: 'Trash emptied permanently', type: 'info' });
+                }
+              }}
+              className="self-start sm:self-auto px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 font-medium hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors cursor-pointer shrink-0 flex items-center gap-1.5"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Empty Trash</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Loading or Empty State */}
       {isLoading ? (
         <div className="py-16 text-center space-y-2 text-[var(--text-tertiary)]">
@@ -243,25 +277,29 @@ export const JournalPage: React.FC = () => {
       ) : filteredEntries.length === 0 ? (
         <div className="p-12 text-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center mx-auto">
-            <PenTool className="w-6 h-6" />
+            {activeTab === 'trash' ? <Trash2 className="w-6 h-6" /> : <PenTool className="w-6 h-6" />}
           </div>
           <div className="space-y-1">
             <h3 className="font-editorial text-2xl font-medium text-[var(--text-primary)]">
-              No entries found
+              {activeTab === 'trash' ? 'Trash is empty' : 'No entries found'}
             </h3>
             <p className="text-sm text-[var(--text-secondary)] max-w-sm mx-auto">
-              {searchQuery
+              {activeTab === 'trash'
+                ? 'No deleted thoughts found. Items you delete will rest here safely for 30 days.'
+                : searchQuery
                 ? 'No thoughts match your current search query.'
                 : 'Your journal is ready. Start by capturing a spontaneous observation or an open question.'}
             </p>
           </div>
-          <button
-            onClick={() => navigate('/journal/new')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium shadow-xs hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Write your first entry</span>
-          </button>
+          {activeTab !== 'trash' && (
+            <button
+              onClick={() => navigate('/journal/new')}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium shadow-xs hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Write your first entry</span>
+            </button>
+          )}
         </div>
       ) : viewMode === 'feed' ? (
         /* Feed View */
@@ -269,8 +307,14 @@ export const JournalPage: React.FC = () => {
           {filteredEntries.map((entry) => (
             <div
               key={entry.id}
-              onClick={() => navigate(`/journal/${entry.id}`)}
-              className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all cursor-pointer space-y-2.5 group"
+              onClick={() => {
+                if (activeTab !== 'trash') {
+                  navigate(`/journal/${entry.id}`);
+                }
+              }}
+              className={`p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all space-y-2.5 group ${
+                activeTab !== 'trash' ? 'cursor-pointer' : ''
+              }`}
             >
               <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)]">
                 <div className="flex items-center gap-2">
@@ -293,18 +337,50 @@ export const JournalPage: React.FC = () => {
                   )}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavourite(entry.id);
-                  }}
-                  className={`p-1 rounded transition-colors ${
-                    entry.is_favourite ? 'text-amber-500' : 'text-[var(--text-tertiary)] hover:text-amber-500'
-                  }`}
-                >
-                  <Star className="w-3.5 h-3.5" fill={entry.is_favourite ? 'currentColor' : 'none'} />
-                </button>
+                {activeTab === 'trash' ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        restoreEntry(entry.id);
+                        showToast({ message: 'Thought restored to your journal', type: 'success' });
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] hover:bg-[var(--accent-olive)] hover:text-white transition-colors text-xs font-medium flex items-center gap-1.5 cursor-pointer"
+                      title="Restore thought"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Restore</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm('Permanently delete this thought? This action cannot be undone.')) {
+                          permanentlyDeleteEntry(entry.id);
+                          showToast({ message: 'Thought permanently deleted' });
+                        }
+                      }}
+                      className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                      title="Delete permanently"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavourite(entry.id);
+                    }}
+                    className={`p-1 rounded transition-colors ${
+                      entry.is_favourite ? 'text-amber-500' : 'text-[var(--text-tertiary)] hover:text-amber-500'
+                    }`}
+                  >
+                    <Star className="w-3.5 h-3.5" fill={entry.is_favourite ? 'currentColor' : 'none'} />
+                  </button>
+                )}
               </div>
 
               <h3 className="font-editorial text-2xl text-[var(--text-primary)] group-hover:text-[var(--accent-olive)] transition-colors">
@@ -342,8 +418,14 @@ export const JournalPage: React.FC = () => {
                 {group.items.map((entry) => (
                   <div
                     key={entry.id}
-                    onClick={() => navigate(`/journal/${entry.id}`)}
-                    className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all cursor-pointer flex items-center justify-between group"
+                    onClick={() => {
+                      if (activeTab !== 'trash') {
+                        navigate(`/journal/${entry.id}`);
+                      }
+                    }}
+                    className={`p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all flex items-center justify-between group ${
+                      activeTab !== 'trash' ? 'cursor-pointer' : ''
+                    }`}
                   >
                     <div className="space-y-1 min-w-0 pr-4">
                       <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)]">
@@ -364,9 +446,43 @@ export const JournalPage: React.FC = () => {
                       </h4>
                     </div>
 
-                    <span className="text-xs text-[var(--text-tertiary)] shrink-0">
-                      {entry.word_count || 0} words
-                    </span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {activeTab === 'trash' ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              restoreEntry(entry.id);
+                              showToast({ message: 'Thought restored to your journal', type: 'success' });
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] hover:bg-[var(--accent-olive)] hover:text-white transition-colors text-xs font-medium flex items-center gap-1.5 cursor-pointer"
+                            title="Restore thought"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            <span>Restore</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm('Permanently delete this thought? This action cannot be undone.')) {
+                                permanentlyDeleteEntry(entry.id);
+                                showToast({ message: 'Thought permanently deleted' });
+                              }
+                            }}
+                            className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                            title="Delete permanently"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[var(--text-tertiary)] shrink-0">
+                          {entry.word_count || 0} words
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

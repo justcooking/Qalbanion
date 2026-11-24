@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
+import type { Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
@@ -17,6 +18,7 @@ interface TipTapEditorProps {
   isTypewriterMode?: boolean;
   onToggleTypewriter?: () => void;
   onOpenShortcuts?: () => void;
+  onEditorReady?: (editor: Editor | null) => void;
 }
 
 export const TipTapEditor: React.FC<TipTapEditorProps> = ({
@@ -27,6 +29,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
   isTypewriterMode = false,
   onToggleTypewriter,
   onOpenShortcuts,
+  onEditorReady,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -72,6 +75,13 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
       onChange(json as Record<string, unknown>, text, words.length);
     },
   });
+
+  // Notify parent of editor instance
+  useEffect(() => {
+    if (onEditorReady) {
+      onEditorReady(editor);
+    }
+  }, [editor, onEditorReady]);
 
   // Sync if initialContent changes externally (e.g. template applied)
   useEffect(() => {

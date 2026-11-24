@@ -5,6 +5,9 @@ import { useJournal, type SyncStatus } from '../hooks/useJournal';
 import { useCollections } from '../hooks/useCollections';
 import { TipTapEditor } from '../components/editor/TipTapEditor';
 import { KeyboardShortcutsModal } from '../components/editor/KeyboardShortcutsModal';
+import { PromptDrawer } from '../components/editor/PromptDrawer';
+import { useToast } from '../contexts/ToastContext';
+import type { Editor } from '@tiptap/react';
 import type { JournalEntry, EntryType, MoodType } from '../types/journal';
 import {
   ArrowLeft,
@@ -26,6 +29,7 @@ import {
   Columns,
   AlignCenter,
   Keyboard,
+  Zap,
 } from 'lucide-react';
 
 export const EntryEditorPage: React.FC = () => {
@@ -33,7 +37,8 @@ export const EntryEditorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const { user } = useAuth();
-  const { saveEntry, loadEntry, deleteEntry, toggleFavourite, toggleArchive } = useJournal();
+  const { saveEntry, loadEntry, moveToTrash, restoreEntry, toggleFavourite, toggleArchive } = useJournal();
+  const { showToast } = useToast();
   const {
     collections,
     getEntryCollections,
@@ -105,6 +110,9 @@ export const EntryEditorPage: React.FC = () => {
     }
   });
   const [isShortcutsOpen, setIsShortcutsOpen] = useState<boolean>(false);
+  const [isPromptDrawerOpen, setIsPromptDrawerOpen] = useState<boolean>(false);
+  const [selectedEnergy, setSelectedEnergy] = useState<string | null>(null);
+  const editorInstanceRef = useRef<Editor | null>(null);
 
   const handleToggleTypewriter = useCallback(() => {
     setIsTypewriterMode((prev) => {
@@ -198,7 +206,17 @@ export const EntryEditorPage: React.FC = () => {
       if (isCurrent) setSelectedCollections(cols);
     });
     getEntryTags(id).then((tags) => {
-      if (isCurrent) setTagsList(tags);
+      if (isCurrent) {
+        setTagsList(tags);
+        const energyTag = tags.find((t) => t.startsWith('energy:'));
+        if (energyTag) {
+          const raw = energyTag.replace('energy:', '');
+          const match = ['low', 'gentle', 'centered', 'energized', 'radiant'].find((e) => e === raw);
+          if (match) {
+            setSelectedEnergy(match.charAt(0).toUpperCase() + match.slice(1));
+          }
+        }
+      }
     });
 
     return () => {
@@ -329,13 +347,46 @@ export const EntryEditorPage: React.FC = () => {
     { label: 'Sad', icon: '🍂' },
   ];
 
+  const energyLevels = [
+    { label: 'Low', icon: '🌿' },
+    { label: 'Gentle', icon: '☁️' },
+    { label: 'Centered', icon: '⚖️' },
+    { label: 'Energized', icon: '⚡' },
+    { label: 'Radiant', icon: '🔥' },
+  ];
+
+  const handleEnergySelect = (energy: string) => {
+    const next = selectedEnergy === energy ? null : energy;
+    setSelectedEnergy(next);
+    const filtered = tagsList.filter((t) => !t.startsWith('energy:'));
+    const nextTags = next ? [...filtered, `energy:${next.toLowerCase()}`] : filtered;
+    setTagsList(nextTags);
+    setEntryTags(entryId, nextTags);
+    triggerAutosave({});
+  };
+
+  const handleSelectPrompt = (promptText: string) => {
+    if (editorInstanceRef.current) {
+      editorInstanceRef.current
+        .chain()
+        .focus()
+        .insertContent(`<blockquote><p><em>${promptText}</em></p></blockquote><p></p>`)
+        .run();
+    }
+  };
+
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this entry?')) {
-      deleteEntry(entryId);
-      navigate('/journal');
-    }
+    moveToTrash(entryId);
+    showToast({
+      message: 'Thought moved to Trash',
+      actionLabel: 'Undo',
+      onAction: () => {
+        restoreEntry(entryId);
+      },
+    });
+    navigate('/journal');
   };
 
   return (
@@ -546,21 +597,33 @@ export const EntryEditorPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Entry Type Selector */}
-      <div className="flex items-center gap-2 select-none">
-        {(['thought', 'journal', 'reflection'] as const).map((type) => (
-          <button
-            key={type}
-            onClick={() => handleTypeChange(type)}
-            className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-all cursor-pointer ${
-              entryType === type
-                ? 'bg-[var(--accent-olive)] text-white shadow-xs'
-                : 'bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            {type}
-          </button>
-        ))}
+      {/* Entry Type Selector & Prompts Trigger */}
+      <div className="flex items-center justify-between gap-2 select-none">
+        <div className="flex items-center gap-2">
+          {(['thought', 'journal', 'reflection'] as const).map((type) => (
+            <button
+              key={type}
+              onClick={() => handleTypeChange(type)}
+              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-all cursor-pointer ${
+                entryType === type
+                  ? 'bg-[var(--accent-olive)] text-white shadow-xs'
+                  : 'bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsPromptDrawerOpen(true)}
+          className="px-3 py-1 rounded-full text-xs font-medium border border-[var(--accent-olive)]/30 bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] hover:bg-[var(--accent-olive)] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+          title="Open reflection prompts"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Prompts</span>
+        </button>
       </div>
 
       {/* Title Input (Optional) */}
@@ -579,6 +642,9 @@ export const EntryEditorPage: React.FC = () => {
         <TipTapEditor
           initialContent={contentJson}
           onChange={handleEditorUpdate}
+          onEditorReady={(ed) => {
+            editorInstanceRef.current = ed;
+          }}
           isTypewriterMode={isTypewriterMode}
           onToggleTypewriter={handleToggleTypewriter}
           onOpenShortcuts={() => setIsShortcutsOpen(true)}
@@ -594,26 +660,52 @@ export const EntryEditorPage: React.FC = () => {
 
       {/* Bottom Context Bar */}
       <div className="pt-6 border-t border-[var(--border-subtle)] space-y-4 select-none">
-        {/* Mood Selector */}
-        <div className="flex items-center gap-2 overflow-x-auto py-1">
-          <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1 mr-1 shrink-0">
-            <Smile className="w-3.5 h-3.5" />
-            Mood:
-          </span>
-          {moods.map((m) => (
-            <button
-              key={m.label}
-              onClick={() => handleMoodSelect(m.label)}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
-                selectedMood === m.label
-                  ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
-                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
-              }`}
-            >
-              <span>{m.icon}</span>
-              <span>{m.label}</span>
-            </button>
-          ))}
+        {/* Mood & Energy Selectors */}
+        <div className="space-y-3">
+          {/* Mood Selector */}
+          <div className="flex items-center gap-2 overflow-x-auto py-1">
+            <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1 mr-1 shrink-0">
+              <Smile className="w-3.5 h-3.5" />
+              Mood:
+            </span>
+            {moods.map((m) => (
+              <button
+                key={m.label}
+                onClick={() => handleMoodSelect(m.label)}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
+                  selectedMood === m.label
+                    ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
+                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
+                }`}
+              >
+                <span>{m.icon}</span>
+                <span>{m.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Energy Level Selector */}
+          <div className="flex items-center gap-2 overflow-x-auto py-1">
+            <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1 mr-1 shrink-0">
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
+              Energy:
+            </span>
+            {energyLevels.map((en) => (
+              <button
+                key={en.label}
+                type="button"
+                onClick={() => handleEnergySelect(en.label)}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
+                  selectedEnergy === en.label
+                    ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
+                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
+                }`}
+              >
+                <span>{en.icon}</span>
+                <span>{en.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Collections & Tags Row */}
@@ -787,6 +879,13 @@ export const EntryEditorPage: React.FC = () => {
       <KeyboardShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* Reflection Prompts Drawer */}
+      <PromptDrawer
+        isOpen={isPromptDrawerOpen}
+        onClose={() => setIsPromptDrawerOpen(false)}
+        onSelectPrompt={handleSelectPrompt}
       />
     </div>
   );

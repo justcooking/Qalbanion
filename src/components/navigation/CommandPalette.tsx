@@ -20,6 +20,7 @@ import {
   FileCode,
   X,
   Home,
+  Trash2,
 } from 'lucide-react';
 
 interface CommandPaletteProps {
@@ -161,6 +162,18 @@ const CommandPaletteDialog: React.FC<{
         keywords: ['settings', 'typography', 'fonts', 'preferences', 'export', 'theme'],
         perform: () => {
           navigate('/settings');
+          onClose();
+        },
+      },
+      {
+        id: 'nav-trash',
+        type: 'action',
+        title: 'Go to Trash',
+        subtitle: 'View, recover, or manage recently deleted thoughts',
+        icon: <Trash2 className="w-4 h-4 text-[var(--accent-olive)]" />,
+        keywords: ['trash', 'bin', 'deleted', 'recover', 'restore'],
+        perform: () => {
+          navigate('/journal');
           onClose();
         },
       },

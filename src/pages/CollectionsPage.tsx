@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCollections } from '../hooks/useCollections';
 import { useJournal } from '../hooks/useJournal';
@@ -11,7 +11,20 @@ import {
   Edit2,
   X,
   Calendar,
+  Pin,
 } from 'lucide-react';
+
+const THEMATIC_ICONS = [
+  { label: 'Stream', icon: '📁' },
+  { label: 'Growth', icon: '🌿' },
+  { label: 'Ideas', icon: '💡' },
+  { label: 'Readings', icon: '📖' },
+  { label: 'Decisions', icon: '🧭' },
+  { label: 'Peace', icon: '🕊️' },
+  { label: 'Life', icon: '🌊' },
+  { label: 'Challenges', icon: '🏔️' },
+  { label: 'Creative', icon: '🎨' },
+];
 
 export const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +36,27 @@ export const CollectionsPage: React.FC = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [color, setColor] = useState('#5E6D55');
+  const [selectedIcon, setSelectedIcon] = useState('📁');
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+
+  // Persistent Pinned Collections & Thematic Icons maps
+  const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('qalbanion_pinned_collections');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [iconsMap, setIconsMap] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem('qalbanion_collection_icons');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const colors = [
     { label: 'Muted Olive', value: '#5E6D55' },
@@ -34,11 +67,25 @@ export const CollectionsPage: React.FC = () => {
     { label: 'Amber Clay', value: '#8E734E' },
   ];
 
+  const togglePin = (colId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPinnedIds((prev) => {
+      const next = prev.includes(colId) ? prev.filter((id) => id !== colId) : [...prev, colId];
+      try {
+        localStorage.setItem('qalbanion_pinned_collections', JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+
   const handleOpenCreate = () => {
     setEditingCollection(null);
     setName('');
     setDescription('');
     setColor('#5E6D55');
+    setSelectedIcon('📁');
     setIsModalOpen(true);
   };
 
@@ -48,6 +95,7 @@ export const CollectionsPage: React.FC = () => {
     setName(col.name);
     setDescription(col.description || '');
     setColor(col.color || '#5E6D55');
+    setSelectedIcon(iconsMap[col.id] || '📁');
     setIsModalOpen(true);
   };
 
@@ -65,6 +113,8 @@ export const CollectionsPage: React.FC = () => {
     e.preventDefault();
     if (!name.trim()) return;
 
+    let targetId = editingCollection?.id;
+
     if (editingCollection) {
       await updateCollection(editingCollection.id, {
         name: name.trim(),
@@ -72,11 +122,33 @@ export const CollectionsPage: React.FC = () => {
         color,
       });
     } else {
-      await createCollection(name.trim(), description.trim(), color);
+      const created = await createCollection(name.trim(), description.trim(), color);
+      targetId = created?.id;
+    }
+
+    if (targetId) {
+      const nextIcons = { ...iconsMap, [targetId]: selectedIcon };
+      setIconsMap(nextIcons);
+      try {
+        localStorage.setItem('qalbanion_collection_icons', JSON.stringify(nextIcons));
+      } catch {
+        /* ignore */
+      }
     }
 
     setIsModalOpen(false);
   };
+
+  // Sort collections: Pinned collections first, then alphabetical
+  const sortedCollections = useMemo(() => {
+    return [...collections].sort((a, b) => {
+      const aPinned = pinnedIds.includes(a.id);
+      const bPinned = pinnedIds.includes(b.id);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [collections, pinnedIds]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
@@ -105,7 +177,7 @@ export const CollectionsPage: React.FC = () => {
         <div className="py-12 text-center text-sm text-[var(--text-tertiary)]">
           Loading your collections...
         </div>
-      ) : collections.length === 0 ? (
+      ) : sortedCollections.length === 0 ? (
         <div className="p-10 text-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-3">
           <FolderTree className="w-8 h-8 mx-auto text-[var(--accent-olive)]" />
           <h3 className="font-editorial text-2xl font-medium text-[var(--text-primary)]">
@@ -124,62 +196,89 @@ export const CollectionsPage: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {collections.map((col) => (
-            <div
-              key={col.id}
-              onClick={() => setSelectedCollection(selectedCollection?.id === col.id ? null : col)}
-              className={`p-5 rounded-2xl border transition-all cursor-pointer space-y-3 group ${
-                selectedCollection?.id === col.id
-                  ? 'border-[var(--accent-olive)] bg-[var(--bg-surface-elevated)] ring-1 ring-[var(--accent-olive)]/30'
-                  : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)]'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
-                  style={{ backgroundColor: col.color || '#5E6D55' }}
-                >
-                  <FolderTree className="w-4 h-4" />
+          {sortedCollections.map((col) => {
+            const isPinned = pinnedIds.includes(col.id);
+            const iconChar = iconsMap[col.id] || '📁';
+
+            return (
+              <div
+                key={col.id}
+                onClick={() => setSelectedCollection(selectedCollection?.id === col.id ? null : col)}
+                className={`p-5 rounded-2xl border transition-all cursor-pointer space-y-3 group ${
+                  selectedCollection?.id === col.id
+                    ? 'border-[var(--accent-olive)] bg-[var(--bg-surface-elevated)] ring-1 ring-[var(--accent-olive)]/30'
+                    : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)]'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base shadow-2xs shrink-0"
+                    style={{ backgroundColor: col.color || '#5E6D55' }}
+                  >
+                    <span>{iconChar}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {/* Pin button */}
+                    <button
+                      type="button"
+                      onClick={(e) => togglePin(col.id, e)}
+                      title={isPinned ? 'Unpin stream' : 'Pin stream to top'}
+                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                        isPinned
+                          ? 'text-[var(--accent-olive)] bg-[var(--accent-olive-soft)]'
+                          : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] opacity-0 group-hover:opacity-100'
+                      }`}
+                    >
+                      <Pin className="w-3.5 h-3.5" fill={isPinned ? 'currentColor' : 'none'} />
+                    </button>
+
+                    <span className="text-xs text-[var(--text-tertiary)]">
+                      {col.entry_count || 0} {col.entry_count === 1 ? 'entry' : 'entries'}
+                    </span>
+
+                    <button
+                      onClick={(e) => handleOpenEdit(col, e)}
+                      className="p-1.5 rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-w-[28px] min-h-[28px] flex items-center justify-center cursor-pointer"
+                      title="Edit collection"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(col.id, e)}
+                      className="p-1.5 rounded text-[var(--text-tertiary)] hover:text-rose-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-w-[28px] min-h-[28px] flex items-center justify-center cursor-pointer"
+                      title="Delete collection"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-[var(--text-tertiary)]">
-                    {col.entry_count || 0} entries
-                  </span>
-                  <button
-                    onClick={(e) => handleOpenEdit(col, e)}
-                    className="p-1.5 rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-w-[28px] min-h-[28px] flex items-center justify-center cursor-pointer"
-                    title="Edit collection"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={(e) => handleDelete(col.id, e)}
-                    className="p-1.5 rounded text-[var(--text-tertiary)] hover:text-rose-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-w-[28px] min-h-[28px] flex items-center justify-center cursor-pointer"
-                    title="Delete collection"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-editorial text-2xl font-medium text-[var(--text-primary)] group-hover:text-[var(--accent-olive)] transition-colors">
+                      {col.name}
+                    </h3>
+                    {isPinned && (
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-olive-soft)] text-[var(--accent-olive)]">
+                        Pinned
+                      </span>
+                    )}
+                  </div>
+                  {col.description && (
+                    <p className="text-xs text-[var(--text-secondary)] mt-1 line-clamp-2 leading-relaxed">
+                      {col.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-2 flex items-center gap-1 text-xs font-medium text-[var(--accent-olive)]">
+                  <span>{selectedCollection?.id === col.id ? 'Viewing entries below' : 'Explore entries'}</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
-
-              <div>
-                <h3 className="font-editorial text-2xl font-medium text-[var(--text-primary)] group-hover:text-[var(--accent-olive)] transition-colors">
-                  {col.name}
-                </h3>
-                {col.description && (
-                  <p className="text-xs text-[var(--text-secondary)] mt-1 line-clamp-2 leading-relaxed">
-                    {col.description}
-                  </p>
-                )}
-              </div>
-
-              <div className="pt-2 flex items-center gap-1 text-xs font-medium text-[var(--accent-olive)]">
-                <span>{selectedCollection?.id === col.id ? 'Viewing entries below' : 'Explore entries'}</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -187,8 +286,8 @@ export const CollectionsPage: React.FC = () => {
       {selectedCollection && (
         <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-4 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: selectedCollection.color }} />
+            <div className="flex items-center gap-2.5">
+              <span className="text-lg">{iconsMap[selectedCollection.id] || '📁'}</span>
               <h2 className="font-editorial text-2xl font-medium text-[var(--text-primary)]">
                 {selectedCollection.name}
               </h2>
@@ -274,6 +373,31 @@ export const CollectionsPage: React.FC = () => {
                 />
               </div>
 
+              {/* Thematic Icon Picker */}
+              <div>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">
+                  Thematic Icon
+                </label>
+                <div className="flex items-center gap-2 overflow-x-auto py-1">
+                  {THEMATIC_ICONS.map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => setSelectedIcon(item.icon)}
+                      title={item.label}
+                      className={`w-9 h-9 rounded-xl border text-base flex items-center justify-center transition-transform cursor-pointer shrink-0 ${
+                        selectedIcon === item.icon
+                          ? 'border-[var(--accent-olive)] bg-[var(--accent-olive-soft)] scale-110 shadow-2xs'
+                          : 'border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:scale-105'
+                      }`}
+                    >
+                      {item.icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Accent Color Picker */}
               <div>
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">
                   Accent Color
@@ -294,7 +418,7 @@ export const CollectionsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-2 flex justify-end gap-2 border-t border-[var(--border-subtle)]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

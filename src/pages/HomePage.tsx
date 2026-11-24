@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJournal } from '../hooks/useJournal';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import { GuidedReflectionModal } from '../components/reflections/GuidedReflectionModal';
 import type { JournalEntry } from '../types/journal';
 import {
   Sparkles,
@@ -14,16 +16,42 @@ import {
   Calendar,
 } from 'lucide-react';
 
+const DAILY_PROMPTS = [
+  'What was one moment today that made you pause, and why did it catch your attention?',
+  'What is an unspoken expectation you can gently release today?',
+  'What is something simple that brought ease or quiet delight into your day?',
+  'If your mind was a room right now, what does it feel like inside?',
+  'What is one small choice you made recently that honoured your peace?',
+  'What truth has been asking for your honest attention lately?',
+  'Where in your life would a little more patience change everything?',
+  'What feeling are you carrying today that deserves to be acknowledged?',
+  'What would feeling completely content with this moment look like?',
+  'What is one thing you have learned about yourself this month?',
+];
+
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { entries, saveEntry } = useJournal();
+  const { showToast } = useToast();
+
   const [quickThought, setQuickThought] = useState('');
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [isGuidedOpen, setIsGuidedOpen] = useState(false);
+  const [currentDate] = useState(() => new Date());
+
+  // Dynamic daily reflection prompt rotating by calendar day
+  const [todayPrompt] = useState(() => {
+    const now = new Date();
+    const dayOfYear = Math.floor(
+      (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return DAILY_PROMPTS[dayOfYear % DAILY_PROMPTS.length];
+  });
 
   // Time-of-day greeting
   const getGreeting = () => {
-    const hour = new Date().getHours();
+    const hour = currentDate.getHours();
     if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
@@ -36,6 +64,74 @@ export const HomePage: React.FC = () => {
     { label: 'Neutral', icon: '☕' },
     { label: 'Thoughtful', icon: '💭' },
   ];
+
+  // Dynamic "On This Day / Past Memory" calculation
+  const onThisDayData = useMemo(() => {
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+
+    const activeEntries = entries.filter((e) => e.status === 'active');
+    if (activeEntries.length === 0) return null;
+
+    // 1. Exact calendar match in a prior year (e.g. 1 year ago)
+    const exactYearMatch = activeEntries.find((e) => {
+      const d = new Date(e.created_at);
+      return d.getMonth() === currentMonth && d.getDate() === currentDay && d.getFullYear() !== currentYear;
+    });
+    if (exactYearMatch) {
+      const yearsAgo = currentYear - new Date(exactYearMatch.created_at).getFullYear();
+      return {
+        entry: exactYearMatch,
+        badge: `On this day · ${yearsAgo} ${yearsAgo === 1 ? 'year' : 'years'} ago`,
+        isExact: true,
+      };
+    }
+
+    // 2. Exact day of month in prior month
+    const sameDayPriorMonth = activeEntries.find((e) => {
+      const d = new Date(e.created_at);
+      const diffDays = Math.floor((currentDate.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+      return d.getDate() === currentDay && diffDays >= 25 && diffDays <= 365;
+    });
+    if (sameDayPriorMonth) {
+      const diffDays = Math.floor((currentDate.getTime() - new Date(sameDayPriorMonth.created_at).getTime()) / (1000 * 60 * 60 * 24));
+      const monthsAgo = Math.max(1, Math.round(diffDays / 30));
+      return {
+        entry: sameDayPriorMonth,
+        badge: `On this day · ${monthsAgo} ${monthsAgo === 1 ? 'month' : 'months'} ago`,
+        isExact: true,
+      };
+    }
+
+    // 3. Fallback: Past memory from at least 7 days ago
+    const olderEntries = activeEntries.filter((e) => {
+      const d = new Date(e.created_at);
+      const diffDays = (currentDate.getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+      return diffDays >= 7;
+    });
+    if (olderEntries.length > 0) {
+      const pick = olderEntries[0];
+      const diffDays = Math.floor((currentDate.getTime() - new Date(pick.created_at).getTime()) / (1000 * 60 * 60 * 24));
+      const timeStr = diffDays >= 30 ? `${Math.round(diffDays / 30)} months ago` : `${diffDays} days ago`;
+      return {
+        entry: pick,
+        badge: `Past memory · ${timeStr}`,
+        isExact: false,
+      };
+    }
+
+    // 4. Default earliest entry
+    if (activeEntries.length > 0) {
+      return {
+        entry: activeEntries[activeEntries.length - 1],
+        badge: 'Early thought',
+        isExact: false,
+      };
+    }
+
+    return null;
+  }, [entries, currentDate]);
 
   const handleQuickSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +165,49 @@ export const HomePage: React.FC = () => {
     saveEntry(newEntry, true);
     setQuickThought('');
     setSelectedMood(null);
+    navigate(`/journal/${newId}`);
+  };
+
+  const handleGuidedComplete = async (
+    reflectionTitle: string,
+    answers: { prompt: string; answer: string }[]
+  ) => {
+    const docContent: Record<string, unknown>[] = [];
+    answers.forEach(({ prompt, answer }) => {
+      docContent.push({
+        type: 'heading',
+        attrs: { level: 2 },
+        content: [{ type: 'text', text: prompt }],
+      });
+      if (answer) {
+        docContent.push({
+          type: 'paragraph',
+          content: [{ type: 'text', text: answer }],
+        });
+      }
+    });
+
+    const newId = crypto.randomUUID();
+    const textContent = answers.map((a) => `## ${a.prompt}\n\n${a.answer}\n\n`).join('');
+    const newEntry: JournalEntry = {
+      id: newId,
+      user_id: user?.id || 'local_guest',
+      title: `${reflectionTitle} — ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
+      content_json: { type: 'doc', content: docContent },
+      content_text: textContent,
+      entry_type: 'reflection',
+      mood: 'Calm',
+      status: 'active',
+      is_favourite: false,
+      word_count: textContent.trim().split(/\s+/).filter(Boolean).length,
+      client_updated_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    await saveEntry(newEntry, true);
+    setIsGuidedOpen(false);
+    showToast({ message: 'Guided reflection saved to your journal', type: 'success' });
     navigate(`/journal/${newId}`);
   };
 
@@ -156,40 +295,85 @@ export const HomePage: React.FC = () => {
         </form>
       </section>
 
-      {/* 3. A Thought to Revisit & Prompt */}
+      {/* 3. On This Day / Memory Revisit & Dynamic Reflection Prompt */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Thought to Revisit */}
-        <div className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col justify-between space-y-3">
-          <div className="space-y-1">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--accent-olive)] flex items-center gap-1.5">
-              <Clock className="w-3 h-3" />
-              A thought to revisit
-            </span>
-            <p className="font-editorial text-lg text-[var(--text-primary)] italic leading-snug pt-1">
-              "Clarity rarely comes from thinking more; it comes from putting thoughts onto paper where you can see them honestly."
-            </p>
+        {/* On This Day / Memory Revisit Card */}
+        {onThisDayData ? (
+          <div
+            onClick={() => navigate(`/journal/${onThisDayData.entry.id}`)}
+            className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--accent-olive)] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
+          >
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--accent-olive)] flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                {onThisDayData.badge}
+              </span>
+              <h3 className="font-editorial text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-olive)] transition-colors leading-snug">
+                {onThisDayData.entry.title || 'Untitled Thought'}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] line-clamp-3 leading-relaxed italic">
+                "{onThisDayData.entry.content_text || 'A quiet reflection.'}"
+              </p>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)] text-xs">
+              <span className="text-[var(--text-tertiary)]">
+                {new Date(onThisDayData.entry.created_at).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+              <span className="text-[var(--accent-olive)] font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                <span>Revisit</span>
+                <ArrowRight className="w-3 h-3" />
+              </span>
+            </div>
           </div>
-          <span className="text-xs text-[var(--text-tertiary)]">Personal Note · 3 weeks ago</span>
-        </div>
+        ) : (
+          <div className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--accent-olive)] flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                A thought for reflection
+              </span>
+              <p className="font-editorial text-base text-[var(--text-primary)] italic leading-snug pt-1">
+                "Clarity rarely comes from thinking more; it comes from putting thoughts onto paper where you can see them honestly."
+              </p>
+            </div>
+            <span className="text-xs text-[var(--text-tertiary)]">Personal Note · A quiet companion</span>
+          </div>
+        )}
 
-        {/* Reflection Prompt */}
+        {/* Dynamic Reflection Prompt with Guided Flow */}
         <div className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col justify-between space-y-3">
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--accent-olive)] flex items-center gap-1.5">
-              <Compass className="w-3 h-3" />
+              <Compass className="w-3.5 h-3.5" />
               Today's reflection prompt
             </span>
-            <p className="text-sm text-[var(--text-primary)] font-medium leading-relaxed pt-1">
-              What was one moment today that made you pause, and why did it catch your attention?
+            <p className="text-sm text-[var(--text-primary)] font-medium leading-relaxed pt-0.5">
+              {todayPrompt}
             </p>
           </div>
-          <button
-            onClick={() => navigate('/reflections')}
-            className="text-xs text-[var(--accent-olive)] hover:underline flex items-center gap-1 font-medium w-fit cursor-pointer"
-          >
-            <span>Explore reflection templates</span>
-            <ArrowRight className="w-3 h-3" />
-          </button>
+
+          <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-subtle)]">
+            <button
+              type="button"
+              onClick={() => setIsGuidedOpen(true)}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer shadow-2xs"
+            >
+              <Sparkles className="w-3 h-3" />
+              <span>Guided Reflection</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/reflections')}
+              className="p-1.5 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer text-xs"
+              title="All Reflection Templates"
+            >
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -269,6 +453,15 @@ export const HomePage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Guided Reflection Modal */}
+      <GuidedReflectionModal
+        isOpen={isGuidedOpen}
+        onClose={() => setIsGuidedOpen(false)}
+        title="Today's Reflection"
+        prompts={[todayPrompt]}
+        onComplete={handleGuidedComplete}
+      />
     </div>
   );
 };

@@ -12,7 +12,6 @@ import {
   Download,
   ShieldCheck,
   HardDrive,
-  Sparkles,
   User as UserIcon,
   LogOut,
   CheckCircle2,
@@ -140,12 +139,9 @@ export const SettingsPage: React.FC = () => {
         <section className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-[var(--accent-olive)]" />
-                <h2 className="font-editorial text-xl font-medium text-[var(--text-primary)]">
-                  Optional AI Assistant
-                </h2>
-              </div>
+              <h2 className="font-editorial text-xl font-medium text-[var(--text-primary)]">
+                Optional AI Assistant
+              </h2>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5">
                 Explore patterns and reflection prompts across hand-selected entries.
               </p>
@@ -153,9 +149,8 @@ export const SettingsPage: React.FC = () => {
 
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5" />
               <span>Open AI Workspace</span>
             </button>
           </div>

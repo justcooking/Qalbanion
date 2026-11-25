@@ -87,11 +87,11 @@ export const InsightsPage: React.FC = () => {
           onClick={() => setActiveTab('patterns')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 min-h-[34px] ${
             activeTab === 'patterns'
-              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-semibold shadow-xs'
+              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          <BarChart2 className="w-3.5 h-3.5" />
+          <BarChart2 className="w-3.5 h-3.5 stroke-[1.5]" />
           <span>Activity & Themes</span>
         </button>
 
@@ -99,11 +99,11 @@ export const InsightsPage: React.FC = () => {
           onClick={() => setActiveTab('evolution')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 min-h-[34px] ${
             activeTab === 'evolution'
-              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-semibold shadow-xs'
+              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          <GitCompare className="w-3.5 h-3.5" />
+          <GitCompare className="w-3.5 h-3.5 stroke-[1.5]" />
           <span>Thought Evolution</span>
         </button>
 
@@ -111,11 +111,11 @@ export const InsightsPage: React.FC = () => {
           onClick={() => setActiveTab('unresolved')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 min-h-[34px] ${
             activeTab === 'unresolved'
-              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-semibold shadow-xs'
+              ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          <HelpCircle className="w-3.5 h-3.5" />
+          <HelpCircle className="w-3.5 h-3.5 stroke-[1.5]" />
           <span>Unresolved Questions ({unresolvedEntries.length})</span>
         </button>
       </div>
@@ -126,34 +126,34 @@ export const InsightsPage: React.FC = () => {
           {/* Key Stat Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-              <span className="text-[11px] uppercase tracking-wider text-[var(--text-tertiary)] font-medium">
+              <span className="text-xs text-[var(--text-tertiary)] font-medium">
                 Total entries
               </span>
-              <p className="font-editorial text-3xl font-medium text-[var(--text-primary)] mt-1">
+              <p className="font-editorial text-3xl font-medium tabular-nums text-[var(--text-primary)] mt-1">
                 {totalEntries}
               </p>
             </div>
             <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-              <span className="text-[11px] uppercase tracking-wider text-[var(--text-tertiary)] font-medium">
+              <span className="text-xs text-[var(--text-tertiary)] font-medium">
                 Total words written
               </span>
-              <p className="font-editorial text-3xl font-medium text-[var(--text-primary)] mt-1">
+              <p className="font-editorial text-3xl font-medium tabular-nums text-[var(--text-primary)] mt-1">
                 {totalWords.toLocaleString()}
               </p>
             </div>
             <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-              <span className="text-[11px] uppercase tracking-wider text-[var(--text-tertiary)] font-medium">
+              <span className="text-xs text-[var(--text-tertiary)] font-medium">
                 Avg. entry length
               </span>
-              <p className="font-editorial text-3xl font-medium text-[var(--text-primary)] mt-1">
+              <p className="font-editorial text-3xl font-medium tabular-nums text-[var(--text-primary)] mt-1">
                 {avgWords} <span className="text-sm font-sans text-[var(--text-tertiary)]">words</span>
               </p>
             </div>
             <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-              <span className="text-[11px] uppercase tracking-wider text-[var(--text-tertiary)] font-medium">
+              <span className="text-xs text-[var(--text-tertiary)] font-medium">
                 Collections
               </span>
-              <p className="font-editorial text-3xl font-medium text-[var(--text-primary)] mt-1">
+              <p className="font-editorial text-3xl font-medium tabular-nums text-[var(--text-primary)] mt-1">
                 {collections.length}
               </p>
             </div>

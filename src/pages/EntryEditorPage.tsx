@@ -18,7 +18,7 @@ import {
   Archive,
   Trash2,
   Clock,
-  Sparkles,
+  Compass,
   FolderTree,
   Tag as TagIcon,
   X,
@@ -30,6 +30,19 @@ import {
   AlignCenter,
   Keyboard,
   Zap,
+  Leaf,
+  Heart,
+  Search,
+  Sun,
+  Coffee,
+  MessageCircle,
+  HelpCircle,
+  CloudRain,
+  Waves,
+  Wind,
+  Cloud,
+  Scale,
+  Flame,
 } from 'lucide-react';
 
 export const EntryEditorPage: React.FC = () => {
@@ -334,25 +347,25 @@ export const EntryEditorPage: React.FC = () => {
     setEntryTags(entryId, next);
   };
 
-  const moods: { label: MoodType; icon: string }[] = [
-    { label: 'Calm', icon: '🌿' },
-    { label: 'Grateful', icon: '✨' },
-    { label: 'Curious', icon: '🔍' },
-    { label: 'Happy', icon: '☀️' },
-    { label: 'Neutral', icon: '☕' },
-    { label: 'Thoughtful' as MoodType, icon: '💭' },
-    { label: 'Confused', icon: '❓' },
-    { label: 'Frustrated', icon: '🌧️' },
-    { label: 'Anxious', icon: '🌊' },
-    { label: 'Sad', icon: '🍂' },
+  const moods: { label: MoodType; icon: React.ComponentType<{ className?: string }> }[] = [
+    { label: 'Calm', icon: Leaf },
+    { label: 'Grateful', icon: Heart },
+    { label: 'Curious', icon: Search },
+    { label: 'Happy', icon: Sun },
+    { label: 'Neutral', icon: Coffee },
+    { label: 'Thoughtful' as MoodType, icon: MessageCircle },
+    { label: 'Confused', icon: HelpCircle },
+    { label: 'Frustrated', icon: CloudRain },
+    { label: 'Anxious', icon: Waves },
+    { label: 'Sad', icon: Wind },
   ];
 
-  const energyLevels = [
-    { label: 'Low', icon: '🌿' },
-    { label: 'Gentle', icon: '☁️' },
-    { label: 'Centered', icon: '⚖️' },
-    { label: 'Energized', icon: '⚡' },
-    { label: 'Radiant', icon: '🔥' },
+  const energyLevels: { label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { label: 'Low', icon: Leaf },
+    { label: 'Gentle', icon: Cloud },
+    { label: 'Centered', icon: Scale },
+    { label: 'Energized', icon: Zap },
+    { label: 'Radiant', icon: Flame },
   ];
 
   const handleEnergySelect = (energy: string) => {
@@ -604,9 +617,9 @@ export const EntryEditorPage: React.FC = () => {
             <button
               key={type}
               onClick={() => handleTypeChange(type)}
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-all cursor-pointer ${
+              className={`px-3 py-1 rounded-lg text-xs font-medium capitalize transition-colors cursor-pointer ${
                 entryType === type
-                  ? 'bg-[var(--accent-olive)] text-white shadow-xs'
+                  ? 'bg-[var(--accent-olive)] text-white'
                   : 'bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -618,10 +631,10 @@ export const EntryEditorPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsPromptDrawerOpen(true)}
-          className="px-3 py-1 rounded-full text-xs font-medium border border-[var(--accent-olive)]/30 bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] hover:bg-[var(--accent-olive)] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+          className="px-3 py-1 rounded-lg text-xs font-medium border border-[var(--accent-olive)]/30 bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] hover:bg-[var(--accent-olive)] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
           title="Open reflection prompts"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
           <span>Prompts</span>
         </button>
       </div>
@@ -664,47 +677,53 @@ export const EntryEditorPage: React.FC = () => {
         <div className="space-y-3">
           {/* Mood Selector */}
           <div className="flex items-center gap-2 overflow-x-auto py-1">
-            <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1 mr-1 shrink-0">
-              <Smile className="w-3.5 h-3.5" />
-              Mood:
+            <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1.5 mr-1 shrink-0">
+              <Smile className="w-3.5 h-3.5 stroke-[1.5]" />
+              Mood
             </span>
-            {moods.map((m) => (
-              <button
-                key={m.label}
-                onClick={() => handleMoodSelect(m.label)}
-                className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
-                  selectedMood === m.label
-                    ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
-                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
-                }`}
-              >
-                <span>{m.icon}</span>
-                <span>{m.label}</span>
-              </button>
-            ))}
+            {moods.map((m) => {
+              const MoodIcon = m.icon;
+              return (
+                <button
+                  key={m.label}
+                  onClick={() => handleMoodSelect(m.label)}
+                  className={`text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    selectedMood === m.label
+                      ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
+                      : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
+                  }`}
+                >
+                  <MoodIcon className="w-3.5 h-3.5 stroke-[1.5]" />
+                  <span>{m.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Energy Level Selector */}
           <div className="flex items-center gap-2 overflow-x-auto py-1">
-            <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1 mr-1 shrink-0">
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
-              Energy:
+            <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1.5 mr-1 shrink-0">
+              <Zap className="w-3.5 h-3.5 stroke-[1.5]" />
+              Energy
             </span>
-            {energyLevels.map((en) => (
-              <button
-                key={en.label}
-                type="button"
-                onClick={() => handleEnergySelect(en.label)}
-                className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
-                  selectedEnergy === en.label
-                    ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
-                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
-                }`}
-              >
-                <span>{en.icon}</span>
-                <span>{en.label}</span>
-              </button>
-            ))}
+            {energyLevels.map((en) => {
+              const EnergyIcon = en.icon;
+              return (
+                <button
+                  key={en.label}
+                  type="button"
+                  onClick={() => handleEnergySelect(en.label)}
+                  className={`text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    selectedEnergy === en.label
+                      ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
+                      : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
+                  }`}
+                >
+                  <EnergyIcon className="w-3.5 h-3.5 stroke-[1.5]" />
+                  <span>{en.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -796,16 +815,16 @@ export const EntryEditorPage: React.FC = () => {
         </div>
 
         {/* Word Count & Read Time */}
-        <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)] pt-1">
+        <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)] pt-1 tabular-nums">
           <div className="flex items-center gap-3">
             <span>{wordCount} words</span>
             <span>·</span>
             <span>{readingTime} min read</span>
           </div>
 
-          <div className="flex items-center gap-1 text-[11px] text-[var(--text-tertiary)]">
-            <Sparkles className="w-3 h-3 text-[var(--accent-olive)]" />
-            <span>Autosaved as you write</span>
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]">
+            <Check className="w-3.5 h-3.5 stroke-[1.5] text-[var(--accent-olive)]" />
+            <span>Autosaved</span>
           </div>
         </div>
       </div>

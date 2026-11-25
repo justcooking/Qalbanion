@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   BookOpen,
   FolderTree,
-  Sparkles,
+  Compass,
   BarChart2,
   Settings,
   PenTool,
@@ -48,28 +48,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) =
     { to: '/home', label: 'Home', icon: Home },
     { to: '/journal', label: 'Journal', icon: BookOpen },
     { to: '/collections', label: 'Collections', icon: FolderTree },
-    { to: '/reflections', label: 'Reflections', icon: Sparkles },
+    { to: '/reflections', label: 'Reflections', icon: Compass },
     { to: '/insights', label: 'Insights', icon: BarChart2 },
     { to: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
-    <aside className="hidden md:flex flex-col md:w-18 lg:w-64 h-screen sticky top-0 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] px-2.5 lg:px-4 py-5 lg:py-6 select-none transition-all duration-200 shrink-0">
+    <aside className="hidden md:flex flex-col md:w-18 lg:w-64 h-screen sticky top-0 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] px-2.5 lg:px-4 py-5 lg:py-6 select-none transition-colors duration-200 shrink-0">
       {/* Brand Header */}
       <div className="px-1 lg:px-3 mb-6">
         <NavLink
           to="/home"
-          className="group flex items-center justify-center lg:justify-start gap-2.5"
+          className="flex items-center justify-center lg:justify-start gap-2.5"
           title="Qalbanion — A companion for your heart"
         >
-          <div className="w-8 h-8 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center border border-[var(--border-subtle)] group-hover:scale-105 transition-transform shrink-0 shadow-xs">
-            <Feather className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center border border-[var(--border-subtle)] shrink-0">
+            <Feather className="w-4 h-4 stroke-[1.5]" />
           </div>
           <div className="hidden lg:block min-w-0">
             <h1 className="font-editorial text-2xl font-medium tracking-tight text-[var(--text-primary)] leading-none truncate">
               Qalbanion
             </h1>
-            <p className="text-[11px] text-[var(--text-tertiary)] tracking-wide mt-1 font-sans truncate">
+            <p className="text-xs text-[var(--text-tertiary)] mt-1 font-sans truncate">
               A companion for your heart
             </p>
           </div>
@@ -81,9 +81,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) =
         <button
           onClick={handleQuickNew}
           title="Write a thought"
-          className="w-10 h-10 lg:w-full lg:h-auto flex items-center justify-center gap-2.5 lg:px-4 lg:py-2.5 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white font-medium text-sm transition-all duration-150 shadow-sm active:scale-[0.98] cursor-pointer"
+          className="w-10 h-10 lg:w-full lg:h-9 flex items-center justify-center gap-2 lg:px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white font-medium text-sm transition-colors duration-150 active:scale-[0.98] cursor-pointer"
         >
-          <PenTool className="w-4 h-4 shrink-0" />
+          <PenTool className="w-4 h-4 stroke-[1.5] shrink-0" />
           <span className="hidden lg:inline">Write a thought</span>
         </button>
       </div>
@@ -93,14 +93,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) =
         <button
           type="button"
           onClick={onOpenPalette}
-          title={`Search thoughts or run commands (${modKey}+K)`}
-          className="w-10 h-10 lg:w-full lg:h-auto flex items-center justify-between lg:px-3 lg:py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:border-[var(--accent-olive)]/60 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer group"
+          title={`Search (${modKey}+K)`}
+          className="w-10 h-10 lg:w-full lg:h-9 flex items-center justify-between lg:px-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:border-[var(--border-strong)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer group"
         >
-          <div className="flex items-center gap-2.5 mx-auto lg:mx-0">
-            <Search className="w-3.5 h-3.5 text-[var(--text-tertiary)] group-hover:text-[var(--accent-olive)] transition-colors shrink-0" />
-            <span className="hidden lg:inline text-xs">Search or jump to...</span>
+          <div className="flex items-center gap-2 mx-auto lg:mx-0">
+            <Search className="w-4 h-4 stroke-[1.5] text-[var(--text-tertiary)] group-hover:text-[var(--text-primary)] transition-colors shrink-0" />
+            <span className="hidden lg:inline text-xs">Search</span>
           </div>
-          <kbd className="hidden lg:inline text-[10px] font-sans px-1.5 py-0.5 rounded border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-tertiary)]">
+          <kbd className="hidden lg:inline text-[11px] font-mono px-1.5 py-0.5 rounded border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-tertiary)]">
             {modKey} K
           </kbd>
         </button>
@@ -117,14 +117,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) =
               end={item.to === '/home'}
               title={item.label}
               className={({ isActive }) =>
-                `flex items-center justify-center lg:justify-start gap-3 px-2.5 lg:px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                `flex items-center justify-center lg:justify-start gap-2.5 px-2.5 lg:px-3 h-9 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-[var(--bg-surface-elevated)] text-[var(--accent-olive-text)] lg:text-[var(--text-primary)] font-semibold shadow-xs'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)]/60'
+                    ? 'bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)]/60 border border-transparent'
                 }`
               }
             >
-              <Icon className="w-4 h-4 stroke-[1.8] shrink-0" />
+              <Icon className="w-4 h-4 stroke-[1.5] shrink-0" />
               <span className="hidden lg:inline">{item.label}</span>
             </NavLink>
           );
@@ -174,13 +174,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) =
           <button
             onClick={installApp}
             title="Install Qalbanion App"
-            className="w-full flex items-center justify-center lg:justify-between p-2 lg:px-3 lg:py-2 rounded-xl bg-[var(--accent-olive-soft)] hover:bg-[var(--accent-olive)]/15 text-[var(--accent-olive)] border border-[var(--accent-olive)]/20 text-xs font-medium transition-all cursor-pointer group"
+            className="w-full flex items-center justify-center lg:justify-between p-2 lg:px-3 lg:py-2 rounded-lg bg-[var(--accent-olive-soft)] hover:bg-[var(--accent-olive)]/15 text-[var(--accent-olive)] border border-[var(--accent-olive)]/20 text-xs font-medium transition-colors cursor-pointer group"
           >
             <div className="flex items-center gap-2">
-              <Download className="w-3.5 h-3.5 transition-transform group-hover:translate-y-0.5 shrink-0" />
+              <Download className="w-4 h-4 stroke-[1.5] shrink-0" />
               <span className="hidden lg:inline">Install Qalbanion</span>
             </div>
-            <span className="hidden lg:inline text-[10px] uppercase font-semibold tracking-wider opacity-70">App</span>
+            <span className="hidden lg:inline text-[11px] font-mono opacity-75">App</span>
           </button>
         )}
 
@@ -189,11 +189,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) =
           title={user ? 'Synced' : 'Saved on this device'}
           className="flex items-center justify-center lg:justify-between p-2 lg:px-3 lg:py-1.5 rounded-lg bg-[var(--bg-surface-elevated)] text-xs text-[var(--text-tertiary)]"
         >
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#16a34a] dark:bg-[#4cc38a] shrink-0" />
             <span className="hidden lg:inline">{user ? 'Synced' : 'Saved'}</span>
           </div>
-          <CloudCheck className="w-3.5 h-3.5 shrink-0 hidden lg:inline" />
+          <CloudCheck className="w-4 h-4 stroke-[1.5] shrink-0 hidden lg:inline" />
         </div>
 
         {/* Theme Toggle */}
@@ -201,14 +201,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewEntry, onOpenPalette }) =
           <span className="hidden lg:inline text-xs text-[var(--text-tertiary)] font-medium">Appearance</span>
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer"
             title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} mode`}
             aria-label="Toggle theme"
           >
             {theme === 'light' ? (
-              <Moon className="w-4 h-4" />
+              <Moon className="w-4 h-4 stroke-[1.5]" />
             ) : (
-              <Sun className="w-4 h-4 text-amber-300" />
+              <Sun className="w-4 h-4 stroke-[1.5]" />
             )}
           </button>
         </div>

@@ -11,7 +11,6 @@ import {
   Star,
   PenTool,
   Clock,
-  Sparkles,
   Layers,
   History,
   FolderTree,
@@ -165,12 +164,12 @@ export const JournalPage: React.FC = () => {
       {onThisDayEntry && (
         <div
           onClick={() => navigate(`/journal/${onThisDayEntry.id}`)}
-          className="p-5 rounded-2xl border border-[var(--accent-olive)]/30 bg-[var(--accent-olive-soft)]/50 hover:bg-[var(--accent-olive-soft)] transition-all cursor-pointer space-y-2 group"
+          className="p-5 rounded-2xl border border-[var(--accent-olive)]/30 bg-[var(--accent-olive-soft)]/50 hover:bg-[var(--accent-olive-soft)] transition-colors cursor-pointer space-y-2 group"
         >
           <div className="flex items-center justify-between text-xs text-[var(--accent-olive-text)] font-medium">
-            <span className="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-              <Sparkles className="w-3.5 h-3.5" />
-              On This Day · {new Date(onThisDayEntry.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+            <span className="flex items-center gap-1.5 text-xs">
+              <Clock className="w-3.5 h-3.5 stroke-[1.5]" />
+              On this day · {new Date(onThisDayEntry.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
             <span className="group-hover:translate-x-0.5 transition-transform text-xs">Revisit →</span>
           </div>
@@ -271,13 +270,13 @@ export const JournalPage: React.FC = () => {
       {/* Loading or Empty State */}
       {isLoading ? (
         <div className="py-16 text-center space-y-2 text-[var(--text-tertiary)]">
-          <Clock className="w-6 h-6 animate-pulse mx-auto" />
-          <p className="text-sm">Loading your journal...</p>
+          <Clock className="w-6 h-6 stroke-[1.5] mx-auto" />
+          <p className="text-sm">Loading your journal</p>
         </div>
       ) : filteredEntries.length === 0 ? (
         <div className="p-12 text-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center mx-auto">
-            {activeTab === 'trash' ? <Trash2 className="w-6 h-6" /> : <PenTool className="w-6 h-6" />}
+            {activeTab === 'trash' ? <Trash2 className="w-6 h-6 stroke-[1.5]" /> : <PenTool className="w-6 h-6 stroke-[1.5]" />}
           </div>
           <div className="space-y-1">
             <h3 className="font-editorial text-2xl font-medium text-[var(--text-primary)]">
@@ -294,9 +293,9 @@ export const JournalPage: React.FC = () => {
           {activeTab !== 'trash' && (
             <button
               onClick={() => navigate('/journal/new')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium shadow-xs hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <PenTool className="w-3.5 h-3.5 stroke-[1.5]" />
               <span>Write your first entry</span>
             </button>
           )}
@@ -312,7 +311,7 @@ export const JournalPage: React.FC = () => {
                   navigate(`/journal/${entry.id}`);
                 }
               }}
-              className={`p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all space-y-2.5 group ${
+              className={`p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-colors space-y-2.5 group ${
                 activeTab !== 'trash' ? 'cursor-pointer' : ''
               }`}
             >

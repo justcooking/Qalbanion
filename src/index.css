@@ -42,7 +42,7 @@
     font-size: var(--font-size-body);
     line-height: var(--line-height-body);
     min-height: 100vh;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 
   h1, h2, h3, .font-editorial {
@@ -130,7 +130,7 @@
 .prose-editorial code {
   background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
-  border-radius: 0.35rem;
+  border-radius: 0.25rem;
   padding: 0.15em 0.35em;
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-size: 0.88em;

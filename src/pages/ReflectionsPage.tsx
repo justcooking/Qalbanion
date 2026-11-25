@@ -7,7 +7,6 @@ import { useToast } from '../contexts/ToastContext';
 import { GuidedReflectionModal } from '../components/reflections/GuidedReflectionModal';
 import type { ReflectionTemplate, JournalEntry } from '../types/journal';
 import {
-  Sparkles,
   Calendar,
   Compass,
   HelpCircle,
@@ -35,7 +34,7 @@ export const ReflectionsPage: React.FC = () => {
     if (title.toLowerCase().includes('daily')) return Calendar;
     if (title.toLowerCase().includes('weekly')) return Compass;
     if (title.toLowerCase().includes('decision')) return HelpCircle;
-    return Sparkles;
+    return BookOpen;
   };
 
   const handleStartReflection = (tpl: ReflectionTemplate) => {
@@ -226,9 +225,9 @@ export const ReflectionsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setGuidedTemplate(tpl)}
-                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer shadow-2xs"
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
                     <span>Guided Flow</span>
                   </button>
 

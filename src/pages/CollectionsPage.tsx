@@ -12,19 +12,33 @@ import {
   X,
   Calendar,
   Pin,
+  Leaf,
+  Lightbulb,
+  BookOpen,
+  Compass,
+  Feather,
+  Waves,
+  Mountain,
+  Palette,
 } from 'lucide-react';
 
 const THEMATIC_ICONS = [
-  { label: 'Stream', icon: '📁' },
-  { label: 'Growth', icon: '🌿' },
-  { label: 'Ideas', icon: '💡' },
-  { label: 'Readings', icon: '📖' },
-  { label: 'Decisions', icon: '🧭' },
-  { label: 'Peace', icon: '🕊️' },
-  { label: 'Life', icon: '🌊' },
-  { label: 'Challenges', icon: '🏔️' },
-  { label: 'Creative', icon: '🎨' },
+  { label: 'Stream', icon: 'folder', Component: FolderTree },
+  { label: 'Growth', icon: 'leaf', Component: Leaf },
+  { label: 'Ideas', icon: 'lightbulb', Component: Lightbulb },
+  { label: 'Readings', icon: 'book', Component: BookOpen },
+  { label: 'Decisions', icon: 'compass', Component: Compass },
+  { label: 'Peace', icon: 'feather', Component: Feather },
+  { label: 'Life', icon: 'waves', Component: Waves },
+  { label: 'Challenges', icon: 'mountain', Component: Mountain },
+  { label: 'Creative', icon: 'palette', Component: Palette },
 ];
+
+const renderCollectionIcon = (iconKey: string) => {
+  const match = THEMATIC_ICONS.find((item) => item.icon === iconKey);
+  const IconComp = match ? match.Component : FolderTree;
+  return <IconComp className="w-4 h-4 stroke-[1.5] text-white" />;
+};
 
 export const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +50,7 @@ export const CollectionsPage: React.FC = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [color, setColor] = useState('#5E6D55');
-  const [selectedIcon, setSelectedIcon] = useState('📁');
+  const [selectedIcon, setSelectedIcon] = useState('folder');
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
 
   // Persistent Pinned Collections & Thematic Icons maps
@@ -198,13 +212,13 @@ export const CollectionsPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {sortedCollections.map((col) => {
             const isPinned = pinnedIds.includes(col.id);
-            const iconChar = iconsMap[col.id] || '📁';
+            const iconChar = iconsMap[col.id] || 'folder';
 
             return (
               <div
                 key={col.id}
                 onClick={() => setSelectedCollection(selectedCollection?.id === col.id ? null : col)}
-                className={`p-5 rounded-2xl border transition-all cursor-pointer space-y-3 group ${
+                className={`p-5 rounded-2xl border transition-colors cursor-pointer space-y-3 group ${
                   selectedCollection?.id === col.id
                     ? 'border-[var(--accent-olive)] bg-[var(--bg-surface-elevated)] ring-1 ring-[var(--accent-olive)]/30'
                     : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)]'
@@ -212,10 +226,10 @@ export const CollectionsPage: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base shadow-2xs shrink-0"
+                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                     style={{ backgroundColor: col.color || '#5E6D55' }}
                   >
-                    <span>{iconChar}</span>
+                    {renderCollectionIcon(iconChar)}
                   </div>
 
                   <div className="flex items-center gap-1.5">
@@ -260,7 +274,7 @@ export const CollectionsPage: React.FC = () => {
                       {col.name}
                     </h3>
                     {isPinned && (
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-olive-soft)] text-[var(--accent-olive)]">
+                      <span className="text-xs font-medium px-2 py-0.5 rounded bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)]">
                         Pinned
                       </span>
                     )}
@@ -379,21 +393,24 @@ export const CollectionsPage: React.FC = () => {
                   Thematic Icon
                 </label>
                 <div className="flex items-center gap-2 overflow-x-auto py-1">
-                  {THEMATIC_ICONS.map((item) => (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => setSelectedIcon(item.icon)}
-                      title={item.label}
-                      className={`w-9 h-9 rounded-xl border text-base flex items-center justify-center transition-transform cursor-pointer shrink-0 ${
-                        selectedIcon === item.icon
-                          ? 'border-[var(--accent-olive)] bg-[var(--accent-olive-soft)] scale-110 shadow-2xs'
-                          : 'border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:scale-105'
-                      }`}
-                    >
-                      {item.icon}
-                    </button>
-                  ))}
+                  {THEMATIC_ICONS.map((item) => {
+                    const IconComp = item.Component;
+                    return (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => setSelectedIcon(item.icon)}
+                        title={item.label}
+                        className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                          selectedIcon === item.icon
+                            ? 'border-[var(--accent-olive)] bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)]'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        }`}
+                      >
+                        <IconComp className="w-4 h-4 stroke-[1.5]" />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -409,8 +426,8 @@ export const CollectionsPage: React.FC = () => {
                       type="button"
                       onClick={() => setColor(c.value)}
                       title={c.label}
-                      className={`w-7 h-7 rounded-full transition-transform cursor-pointer ${
-                        color === c.value ? 'scale-125 ring-2 ring-offset-2 ring-[var(--accent-olive)]' : 'hover:scale-110'
+                      className={`w-7 h-7 rounded-full transition-colors cursor-pointer ${
+                        color === c.value ? 'ring-2 ring-offset-2 ring-[var(--accent-olive)]' : ''
                       }`}
                       style={{ backgroundColor: c.value }}
                     />

@@ -6,7 +6,7 @@ import { useToast } from '../contexts/ToastContext';
 import { GuidedReflectionModal } from '../components/reflections/GuidedReflectionModal';
 import type { JournalEntry } from '../types/journal';
 import {
-  Sparkles,
+  PenTool,
   ArrowRight,
   Clock,
   Compass,
@@ -14,6 +14,11 @@ import {
   Smile,
   BookOpen,
   Calendar,
+  Leaf,
+  Heart,
+  Search,
+  Coffee,
+  MessageCircle,
 } from 'lucide-react';
 
 const DAILY_PROMPTS = [
@@ -49,20 +54,18 @@ export const HomePage: React.FC = () => {
     return DAILY_PROMPTS[dayOfYear % DAILY_PROMPTS.length];
   });
 
-  // Time-of-day greeting
-  const getGreeting = () => {
-    const hour = currentDate.getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  };
+  const formattedDate = currentDate.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
 
   const moods = [
-    { label: 'Calm', icon: '🌿' },
-    { label: 'Grateful', icon: '✨' },
-    { label: 'Curious', icon: '🔍' },
-    { label: 'Neutral', icon: '☕' },
-    { label: 'Thoughtful', icon: '💭' },
+    { label: 'Calm', icon: Leaf },
+    { label: 'Grateful', icon: Heart },
+    { label: 'Curious', icon: Search },
+    { label: 'Neutral', icon: Coffee },
+    { label: 'Thoughtful', icon: MessageCircle },
   ];
 
   // Dynamic "On This Day / Past Memory" calculation
@@ -216,23 +219,23 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="space-y-10 max-w-3xl mx-auto pb-12 animate-in fade-in duration-200">
-      {/* 1. Welcoming Editorial Header */}
+      {/* 1. Editorial Header */}
       <section className="space-y-2">
         <h1 className="font-editorial text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-[var(--text-primary)]">
-          {getGreeting()}.
+          {formattedDate}
         </h1>
-        <p className="text-[var(--text-secondary)] text-sm sm:text-base font-light">
+        <p className="text-[var(--text-secondary)] text-sm sm:text-base font-normal">
           A place to put your thoughts into words, and understand what they reveal over time.
         </p>
       </section>
 
       {/* 2. Prominent Quick-Entry Area */}
-      <section className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-6 shadow-xs transition-all">
+      <section className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-6 transition-colors">
         <form onSubmit={handleQuickSubmit} className="space-y-4">
           <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)] font-medium">
-            <span className="flex items-center gap-1.5 uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-[var(--accent-olive)]" />
-              Quick Thought
+            <span className="flex items-center gap-2 text-[var(--text-secondary)]">
+              <PenTool className="w-3.5 h-3.5 stroke-[1.5] text-[var(--accent-olive)]" />
+              Quick thought
             </span>
             <span className="hidden sm:inline">No title or tags required</span>
           </div>
@@ -240,7 +243,7 @@ export const HomePage: React.FC = () => {
           <textarea
             value={quickThought}
             onChange={(e) => setQuickThought(e.target.value)}
-            placeholder="What is occupying your mind right now? Write freely..."
+            placeholder="Write a thought"
             rows={3}
             className="w-full bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)] resize-none focus:outline-none font-sans text-base leading-relaxed"
           />
@@ -248,25 +251,28 @@ export const HomePage: React.FC = () => {
           {/* Quick Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[var(--border-subtle)]">
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll py-1">
-              <span className="text-xs text-[var(--text-tertiary)] mr-1 flex items-center gap-1 shrink-0">
-                <Smile className="w-3.5 h-3.5" />
-                Mood:
+              <span className="text-xs text-[var(--text-tertiary)] mr-1 flex items-center gap-1.5 shrink-0">
+                <Smile className="w-3.5 h-3.5 stroke-[1.5]" />
+                Mood
               </span>
-              {moods.map((m) => (
-                <button
-                  key={m.label}
-                  type="button"
-                  onClick={() => setSelectedMood(selectedMood === m.label ? null : m.label)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 min-h-[30px] ${
-                    selectedMood === m.label
-                      ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)]'
-                      : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
-                  }`}
-                >
-                  <span>{m.icon}</span>
-                  <span>{m.label}</span>
-                </button>
-              ))}
+              {moods.map((m) => {
+                const MoodIcon = m.icon;
+                return (
+                  <button
+                    key={m.label}
+                    type="button"
+                    onClick={() => setSelectedMood(selectedMood === m.label ? null : m.label)}
+                    className={`text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 min-h-[32px] ${
+                      selectedMood === m.label
+                        ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)]'
+                        : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
+                    }`}
+                  >
+                    <MoodIcon className="w-3.5 h-3.5 stroke-[1.5]" />
+                    <span>{m.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex items-center justify-end gap-2 sm:ml-auto">
@@ -285,10 +291,10 @@ export const HomePage: React.FC = () => {
               <button
                 type="submit"
                 disabled={!quickThought.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs min-h-[34px]"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer min-h-[34px]"
               >
                 <span>Save</span>
-                <Send className="w-3 h-3" />
+                <Send className="w-3.5 h-3.5 stroke-[1.5]" />
               </button>
             </div>
           </div>
@@ -301,18 +307,18 @@ export const HomePage: React.FC = () => {
         {onThisDayData ? (
           <div
             onClick={() => navigate(`/journal/${onThisDayData.entry.id}`)}
-            className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--accent-olive)] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
+            className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-colors cursor-pointer flex flex-col justify-between space-y-3 group"
           >
             <div className="space-y-1.5">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--accent-olive)] flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
+              <span className="text-xs font-medium text-[var(--accent-olive-text)] flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 stroke-[1.5]" />
                 {onThisDayData.badge}
               </span>
               <h3 className="font-editorial text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-olive)] transition-colors leading-snug">
                 {onThisDayData.entry.title || 'Untitled Thought'}
               </h3>
-              <p className="text-xs text-[var(--text-secondary)] line-clamp-3 leading-relaxed italic">
-                "{onThisDayData.entry.content_text || 'A quiet reflection.'}"
+              <p className="text-xs text-[var(--text-secondary)] line-clamp-3 leading-relaxed">
+                {onThisDayData.entry.content_text || 'A quiet reflection.'}
               </p>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)] text-xs">
@@ -323,33 +329,33 @@ export const HomePage: React.FC = () => {
                   year: 'numeric',
                 })}
               </span>
-              <span className="text-[var(--accent-olive)] font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+              <span className="text-[var(--accent-olive-text)] font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                 <span>Revisit</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5 stroke-[1.5]" />
               </span>
             </div>
           </div>
         ) : (
           <div className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col justify-between space-y-3">
             <div className="space-y-1.5">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--accent-olive)] flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
+              <span className="text-xs font-medium text-[var(--accent-olive-text)] flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 stroke-[1.5]" />
                 A thought for reflection
               </span>
-              <p className="font-editorial text-base text-[var(--text-primary)] italic leading-snug pt-1">
-                "Clarity rarely comes from thinking more; it comes from putting thoughts onto paper where you can see them honestly."
+              <p className="font-editorial text-base text-[var(--text-primary)] leading-snug pt-1">
+                Clarity rarely comes from thinking more; it comes from putting thoughts onto paper where you can see them honestly.
               </p>
             </div>
-            <span className="text-xs text-[var(--text-tertiary)]">Personal Note · A quiet companion</span>
+            <span className="text-xs text-[var(--text-tertiary)]">Personal note</span>
           </div>
         )}
 
         {/* Dynamic Reflection Prompt with Guided Flow */}
         <div className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col justify-between space-y-3">
           <div className="space-y-1.5">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--accent-olive)] flex items-center gap-1.5">
-              <Compass className="w-3.5 h-3.5" />
-              Today's reflection prompt
+            <span className="text-xs font-medium text-[var(--accent-olive-text)] flex items-center gap-1.5">
+              <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
+              Today&apos;s reflection prompt
             </span>
             <p className="text-sm text-[var(--text-primary)] font-medium leading-relaxed pt-0.5">
               {todayPrompt}
@@ -360,18 +366,18 @@ export const HomePage: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsGuidedOpen(true)}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer shadow-2xs"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
             >
-              <Sparkles className="w-3 h-3" />
-              <span>Guided Reflection</span>
+              <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
+              <span>Guided reflection</span>
             </button>
             <button
               type="button"
               onClick={() => navigate('/reflections')}
-              className="p-1.5 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer text-xs"
-              title="All Reflection Templates"
+              className="p-2 rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer text-xs"
+              title="All reflection templates"
             >
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 stroke-[1.5]" />
             </button>
           </div>
         </div>
@@ -388,18 +394,18 @@ export const HomePage: React.FC = () => {
             className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors cursor-pointer"
           >
             <span>View all</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 stroke-[1.5]" />
           </button>
         </div>
 
         {recentEntries.length === 0 ? (
           <div
             onClick={() => navigate('/journal/new')}
-            className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all cursor-pointer space-y-2 group"
+            className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-colors cursor-pointer space-y-2 group"
           >
             <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)]">
-              <span className="font-medium text-[var(--accent-olive)] uppercase tracking-wider text-[11px]">
-                Welcome
+              <span className="font-medium text-[var(--accent-olive-text)] text-xs">
+                First entry
               </span>
               <span>Just now</span>
             </div>
@@ -416,7 +422,7 @@ export const HomePage: React.FC = () => {
               <div
                 key={entry.id}
                 onClick={() => navigate(`/journal/${entry.id}`)}
-                className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all cursor-pointer space-y-2 group"
+                className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-colors cursor-pointer space-y-2 group"
               >
                 <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)]">
                   <div className="flex items-center gap-2">

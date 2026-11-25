@@ -5,7 +5,7 @@ import {
   X,
   BookOpen,
   FolderTree,
-  Sparkles,
+  Compass,
   BarChart2,
   Settings,
   PenTool,
@@ -45,7 +45,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ onOpenPalette }) => {
     { to: '/home', label: 'Home', icon: Home },
     { to: '/journal', label: 'Journal', icon: BookOpen },
     { to: '/collections', label: 'Collections', icon: FolderTree },
-    { to: '/reflections', label: 'Reflections', icon: Sparkles },
+    { to: '/reflections', label: 'Reflections', icon: Compass },
     { to: '/insights', label: 'Insights', icon: BarChart2 },
     { to: '/settings', label: 'Settings', icon: Settings },
   ];
@@ -66,8 +66,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ onOpenPalette }) => {
             onClick={() => setIsOpen(false)}
             className="flex items-center gap-2"
           >
-            <div className="w-7 h-7 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center border border-[var(--border-subtle)] shadow-xs">
-              <Feather className="w-3.5 h-3.5" />
+            <div className="w-7 h-7 rounded-lg bg-[var(--accent-olive-soft)] text-[var(--accent-olive)] flex items-center justify-center border border-[var(--border-subtle)]">
+              <Feather className="w-4 h-4 stroke-[1.5]" />
             </div>
             <span className="font-editorial text-xl font-medium tracking-tight text-[var(--text-primary)]">
               Qalbanion
@@ -78,27 +78,27 @@ export const MobileNav: React.FC<MobileNavProps> = ({ onOpenPalette }) => {
           <div className="flex items-center gap-1">
             <button
               onClick={onOpenPalette}
-              className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
-              aria-label="Search thoughts or jump to"
-              title="Search thoughts or commands"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
+              aria-label="Search"
+              title="Search"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-4 h-4 stroke-[1.5]" />
             </button>
 
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
               aria-label="Toggle theme"
             >
-              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-300" />}
+              {theme === 'light' ? <Moon className="w-4 h-4 stroke-[1.5]" /> : <Sun className="w-4 h-4 stroke-[1.5]" />}
             </button>
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
               aria-label="Open menu"
             >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isOpen ? <X className="w-5 h-5 stroke-[1.5]" /> : <Menu className="w-5 h-5 stroke-[1.5]" />}
             </button>
           </div>
         </div>
@@ -110,9 +110,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ onOpenPalette }) => {
               <div className="space-y-2">
                 <button
                   onClick={handleWriteClick}
-                  className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl bg-[var(--accent-olive)] text-white font-medium text-base shadow-sm cursor-pointer active:scale-[0.99] transition-transform"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[var(--accent-olive)] text-white font-medium text-base cursor-pointer active:scale-[0.98] transition-transform"
                 >
-                  <PenTool className="w-4 h-4" />
+                  <PenTool className="w-4 h-4 stroke-[1.5]" />
                   <span>Write a thought</span>
                 </button>
 
@@ -122,10 +122,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({ onOpenPalette }) => {
                     setIsOpen(false);
                     if (onOpenPalette) onOpenPalette();
                   }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                 >
-                  <Search className="w-4 h-4 text-[var(--accent-olive)]" />
-                  <span>Search thoughts, collections, commands...</span>
+                  <Search className="w-4 h-4 stroke-[1.5] text-[var(--text-tertiary)]" />
+                  <span>Search</span>
                 </button>
               </div>
 
@@ -139,14 +139,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({ onOpenPalette }) => {
                       end={item.to === '/home'}
                       onClick={() => setIsOpen(false)}
                       className={({ isActive }) =>
-                        `flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                        `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                           isActive
-                            ? 'bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] font-semibold shadow-xs'
-                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)]/60'
+                            ? 'bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
+                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)]/60 border border-transparent'
                         }`
                       }
                     >
-                      <Icon className="w-5 h-5 stroke-[1.8] text-[var(--accent-olive)]" />
+                      <Icon className="w-4 h-4 stroke-[1.5]" />
                       <span>{item.label}</span>
                     </NavLink>
                   );

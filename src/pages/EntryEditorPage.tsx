@@ -447,6 +447,7 @@ export const EntryEditorPage: React.FC = () => {
 
       <div className={`w-full ${isFocusMode ? (isWide ? 'max-w-4xl' : 'max-w-3xl') : ''} space-y-6`}>
         {/* Top Header Bar */}
+        {!isFocusMode && (
         <div className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] text-xs text-[var(--text-tertiary)] select-none">
           <button
             onClick={() => {
@@ -608,7 +609,7 @@ export const EntryEditorPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+        )}
 
       {/* Entry Type Selector & Prompts Trigger */}
       <div className="flex items-center justify-between gap-2 select-none">
@@ -827,6 +828,7 @@ export const EntryEditorPage: React.FC = () => {
             <span>Autosaved</span>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Floating Bottom Companion HUD */}

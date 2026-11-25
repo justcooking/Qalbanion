@@ -197,7 +197,7 @@ export const JournalPage: React.FC = () => {
         </div>
 
         {/* Filter Pills & Collection Filter */}
-        <div className="flex items-center gap-2 select-none overflow-x-auto no-scrollbar touch-scroll pb-1">
+        <div className="flex flex-wrap items-center gap-2 select-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -205,13 +205,13 @@ export const JournalPage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 min-h-[34px] ${
+                className={`flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                   isActive
                     ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] border border-[var(--accent-olive)]'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border border-transparent'
                 }`}
               >
-                {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+                {Icon && <Icon className="w-3.5 h-3.5 stroke-[1.5] shrink-0" />}
                 <span>{tab.label}</span>
               </button>
             );
@@ -219,20 +219,20 @@ export const JournalPage: React.FC = () => {
 
           {/* Optional Collection filter badge */}
           {collections.length > 0 && (
-            <div className="flex items-center gap-1 overflow-x-auto py-1 pl-2 border-l border-[var(--border-subtle)]">
+            <div className="flex flex-wrap items-center gap-1.5 pl-2 border-l border-[var(--border-subtle)]">
               {collections.map((col) => (
                 <button
                   key={col.id}
                   onClick={() => setSelectedCollectionId(selectedCollectionId === col.id ? null : col.id)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
+                  className={`text-xs h-8 px-2.5 rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                     selectedCollectionId === col.id
                       ? 'bg-[var(--accent-olive-soft)] border-[var(--accent-olive)] text-[var(--accent-olive-text)] font-medium'
                       : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)]'
                   }`}
                 >
-                  <FolderTree className="w-3 h-3" />
+                  <FolderTree className="w-3.5 h-3.5 stroke-[1.5]" />
                   <span>{col.name}</span>
-                  {selectedCollectionId === col.id && <X className="w-3 h-3 ml-0.5" />}
+                  {selectedCollectionId === col.id && <X className="w-3 h-3 stroke-[1.5] ml-0.5" />}
                 </button>
               ))}
             </div>

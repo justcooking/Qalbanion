@@ -168,7 +168,7 @@ export const ReflectionsPage: React.FC = () => {
           Loading reflection frameworks...
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map((tpl) => {
             const Icon = getTemplateIcon(tpl.name);
             const isCustom = !tpl.is_default;
@@ -176,7 +176,7 @@ export const ReflectionsPage: React.FC = () => {
             return (
               <div
                 key={tpl.id}
-                className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-all flex flex-col justify-between space-y-4 group shadow-2xs"
+                className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] transition-colors flex flex-col justify-between space-y-4 group"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -214,32 +214,32 @@ export const ReflectionsPage: React.FC = () => {
                   <div className="space-y-1.5 pt-2">
                     {tpl.prompts.map((prompt, idx) => (
                       <div key={idx} className="text-xs text-[var(--text-secondary)] flex items-start gap-2">
-                        <span className="text-[var(--accent-olive)] font-bold">•</span>
-                        <span className="italic leading-snug">{prompt}</span>
+                        <span className="text-[var(--accent-olive)] font-medium">•</span>
+                        <span className="leading-snug">{prompt}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setGuidedTemplate(tpl)}
-                    className="flex-1 flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex-1 min-w-0 flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer whitespace-nowrap"
                   >
-                    <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
+                    <Compass className="w-3.5 h-3.5 stroke-[1.5] shrink-0" />
                     <span>Guided flow</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleStartReflection(tpl)}
-                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer whitespace-nowrap"
+                    className="shrink-0 flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg border border-[var(--border-subtle)] text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer whitespace-nowrap"
                     title="Open directly in full editor"
                   >
-                    <BookOpen className="w-3.5 h-3.5 stroke-[1.5]" />
-                    <span className="hidden sm:inline">Editor</span>
-                    <ArrowRight className="w-3 h-3 stroke-[1.5]" />
+                    <BookOpen className="w-3.5 h-3.5 stroke-[1.5] shrink-0" />
+                    <span>Editor</span>
+                    <ArrowRight className="w-3 h-3 stroke-[1.5] shrink-0" />
                   </button>
                 </div>
               </div>

@@ -283,7 +283,7 @@ export const HomePage: React.FC = () => {
                     state: { initialContent: quickThought, initialMood: selectedMood },
                   })
                 }
-                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3 py-1.5 rounded-lg hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer min-h-[34px]"
+                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] h-9 px-3 rounded-lg hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer whitespace-nowrap"
               >
                 Open full editor
               </button>
@@ -291,7 +291,7 @@ export const HomePage: React.FC = () => {
               <button
                 type="submit"
                 disabled={!quickThought.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer min-h-[34px]"
+                className="flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
               >
                 <span>Save</span>
                 <Send className="w-3.5 h-3.5 stroke-[1.5]" />
@@ -366,7 +366,7 @@ export const HomePage: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsGuidedOpen(true)}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer whitespace-nowrap"
             >
               <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
               <span>Guided reflection</span>
@@ -374,7 +374,7 @@ export const HomePage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/reflections')}
-              className="p-2 rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer text-xs"
+              className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer shrink-0"
               title="All reflection templates"
             >
               <ArrowRight className="w-3.5 h-3.5 stroke-[1.5]" />

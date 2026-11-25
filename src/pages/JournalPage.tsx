@@ -123,38 +123,38 @@ export const JournalPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
           {/* View Mode Toggle */}
-          <div className="flex items-center p-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs select-none">
+          <div className="flex items-center p-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs select-none shrink-0">
             <button
               onClick={() => setViewMode('feed')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 h-7 px-3 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
                 viewMode === 'feed'
-                  ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium shadow-xs'
+                  ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-3.5 h-3.5 stroke-[1.5]" />
               <span>Feed</span>
             </button>
             <button
               onClick={() => setViewMode('timeline')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 h-7 px-3 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
                 viewMode === 'timeline'
-                  ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium shadow-xs'
+                  ? 'bg-[var(--accent-olive-soft)] text-[var(--accent-olive-text)] font-medium'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
-              <History className="w-3.5 h-3.5" />
+              <History className="w-3.5 h-3.5 stroke-[1.5]" />
               <span>Timeline</span>
             </button>
           </div>
 
           <button
             onClick={() => navigate('/journal/new')}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5 stroke-[1.5]" />
             <span>New entry</span>
           </button>
         </div>
@@ -293,7 +293,7 @@ export const JournalPage: React.FC = () => {
           {activeTab !== 'trash' && (
             <button
               onClick={() => navigate('/journal/new')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer whitespace-nowrap"
             >
               <PenTool className="w-3.5 h-3.5 stroke-[1.5]" />
               <span>Write your first entry</span>

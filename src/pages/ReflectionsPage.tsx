@@ -155,10 +155,10 @@ export const ReflectionsPage: React.FC = () => {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors self-start sm:self-auto cursor-pointer whitespace-nowrap shrink-0"
         >
-          <Plus className="w-4 h-4" />
-          <span>New Framework</span>
+          <Plus className="w-3.5 h-3.5 stroke-[1.5]" />
+          <span>New framework</span>
         </button>
       </div>
 
@@ -225,21 +225,21 @@ export const ReflectionsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setGuidedTemplate(tpl)}
-                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer"
+                    className="flex-1 flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg bg-[var(--accent-olive)] text-white text-xs font-medium hover:bg-[var(--accent-olive-hover)] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
-                    <span>Guided Flow</span>
+                    <span>Guided flow</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleStartReflection(tpl)}
-                    className="flex items-center gap-1 px-3 py-2 rounded-xl border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer whitespace-nowrap"
                     title="Open directly in full editor"
                   >
-                    <BookOpen className="w-3.5 h-3.5" />
+                    <BookOpen className="w-3.5 h-3.5 stroke-[1.5]" />
                     <span className="hidden sm:inline">Editor</span>
-                    <ArrowRight className="w-3 h-3 ml-0.5" />
+                    <ArrowRight className="w-3 h-3 stroke-[1.5]" />
                   </button>
                 </div>
               </div>
@@ -337,13 +337,13 @@ export const ReflectionsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer"
+                  className="h-9 px-4 rounded-lg text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium shadow-xs transition-colors cursor-pointer"
+                  className="h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer whitespace-nowrap"
                 >
                   Create template
                 </button>

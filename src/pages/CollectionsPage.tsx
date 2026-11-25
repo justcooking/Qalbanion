@@ -108,7 +108,7 @@ export const CollectionsPage: React.FC = () => {
     setName('');
     setDescription('');
     setColor('#5E6D55');
-    setSelectedIcon('📁');
+    setSelectedIcon('folder');
     setIsModalOpen(true);
   };
 
@@ -118,7 +118,7 @@ export const CollectionsPage: React.FC = () => {
     setName(col.name);
     setDescription(col.description || '');
     setColor(col.color || '#5E6D55');
-    setSelectedIcon(iconsMap[col.id] || '📁');
+    setSelectedIcon(iconsMap[col.id] || 'folder');
     setIsModalOpen(true);
   };
 
@@ -188,9 +188,9 @@ export const CollectionsPage: React.FC = () => {
 
         <button
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors self-start sm:self-auto cursor-pointer whitespace-nowrap shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5 stroke-[1.5]" />
           <span>New collection</span>
         </button>
       </div>
@@ -211,9 +211,9 @@ export const CollectionsPage: React.FC = () => {
           </p>
           <button
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer whitespace-nowrap"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 stroke-[1.5]" />
             <span>Create your first collection</span>
           </button>
         </div>
@@ -459,13 +459,13 @@ export const CollectionsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer"
+                  className="h-9 px-4 rounded-lg text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface-elevated)] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium shadow-xs transition-colors cursor-pointer"
+                  className="h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer whitespace-nowrap"
                 >
                   {editingCollection ? 'Save changes' : 'Create collection'}
                 </button>

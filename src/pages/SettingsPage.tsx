@@ -85,18 +85,18 @@ export const SettingsPage: React.FC = () => {
             {user ? (
               <button
                 onClick={() => signOut()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
+                <LogOut className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>Sign out</span>
               </button>
             ) : (
               <a
                 href="/auth"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent-olive)] text-white text-xs font-medium cursor-pointer"
+                className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
-                <UserIcon className="w-3.5 h-3.5" />
-                <span>Sign In to Sync</span>
+                <UserIcon className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>Sign in to sync</span>
               </a>
             )}
           </div>
@@ -149,7 +149,7 @@ export const SettingsPage: React.FC = () => {
 
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[var(--accent-olive)] hover:bg-[var(--accent-olive-hover)] text-white text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <span>Open AI Workspace</span>
             </button>

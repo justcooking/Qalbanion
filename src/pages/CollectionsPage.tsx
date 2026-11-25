@@ -42,8 +42,17 @@ const renderCollectionIcon = (iconKey: string) => {
 
 export const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { collections, isLoading, createCollection, updateCollection, deleteCollection } = useCollections();
+  const { collections, entryCollectionsMap, isLoading, createCollection, updateCollection, deleteCollection } = useCollections();
   const { entries } = useJournal();
+
+  const getCollectionEntries = (collectionId: string) => {
+    return entries.filter((entry) => {
+      if (entry.status === 'trashed') return false;
+      const fromEntry = entry.collections?.includes(collectionId);
+      const fromMap = entryCollectionsMap[entry.id]?.includes(collectionId);
+      return Boolean(fromEntry || fromMap);
+    });
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
@@ -247,8 +256,11 @@ export const CollectionsPage: React.FC = () => {
                       <Pin className="w-3.5 h-3.5" fill={isPinned ? 'currentColor' : 'none'} />
                     </button>
 
-                    <span className="text-xs text-[var(--text-tertiary)]">
-                      {col.entry_count || 0} {col.entry_count === 1 ? 'entry' : 'entries'}
+                    <span className="text-xs tabular-nums text-[var(--text-tertiary)]">
+                      {(() => {
+                        const count = entries.length > 0 ? getCollectionEntries(col.id).length : (col.entry_count || 0);
+                        return `${count} ${count === 1 ? 'entry' : 'entries'}`;
+                      })()}
                     </span>
 
                     <button
@@ -297,11 +309,18 @@ export const CollectionsPage: React.FC = () => {
       )}
 
       {/* Selected Collection Entries View */}
-      {selectedCollection && (
+      {selectedCollection && (() => {
+        const collectionEntries = getCollectionEntries(selectedCollection.id);
+        return (
         <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-4 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
             <div className="flex items-center gap-2.5">
-              <span className="text-lg">{iconsMap[selectedCollection.id] || '📁'}</span>
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={{ backgroundColor: selectedCollection.color || '#5E6D55' }}
+              >
+                {renderCollectionIcon(iconsMap[selectedCollection.id] || 'folder')}
+              </div>
               <h2 className="font-editorial text-2xl font-medium text-[var(--text-primary)]">
                 {selectedCollection.name}
               </h2>
@@ -310,38 +329,39 @@ export const CollectionsPage: React.FC = () => {
               onClick={() => setSelectedCollection(null)}
               className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 stroke-[1.5]" />
             </button>
           </div>
 
           <div className="space-y-2">
-            {entries.length === 0 ? (
+            {collectionEntries.length === 0 ? (
               <p className="text-xs text-[var(--text-tertiary)] py-4 text-center">
                 No entries assigned to this collection yet. Open any entry and attach it to this collection.
               </p>
             ) : (
-              entries.slice(0, 5).map((entry) => (
+              collectionEntries.map((entry) => (
                 <div
                   key={entry.id}
                   onClick={() => navigate(`/journal/${entry.id}`)}
-                  className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:border-[var(--accent-olive)] transition-all cursor-pointer flex items-center justify-between"
+                  className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] hover:border-[var(--border-strong)] transition-colors cursor-pointer flex items-center justify-between"
                 >
                   <div className="space-y-0.5">
                     <h4 className="font-editorial text-lg text-[var(--text-primary)]">
                       {entry.title || 'Untitled Thought'}
                     </h4>
                     <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
+                      <Calendar className="w-3 h-3 stroke-[1.5]" />
                       {new Date(entry.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[var(--text-tertiary)]" />
+                  <ArrowRight className="w-4 h-4 stroke-[1.5] text-[var(--text-tertiary)]" />
                 </div>
               ))
             )}
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Modal: Create or Edit Collection */}
       {isModalOpen && (

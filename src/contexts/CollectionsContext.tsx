@@ -22,6 +22,7 @@ interface TagRelationRow {
 interface CollectionsContextType {
   collections: Collection[];
   tags: Tag[];
+  entryCollectionsMap: Record<string, string[]>;
   isLoading: boolean;
   createCollection: (name: string, description?: string, color?: string) => Promise<Collection | null>;
   updateCollection: (id: string, updates: Partial<Collection>) => Promise<void>;
@@ -63,7 +64,31 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   });
 
+  const [entryCollectionsMap, setEntryCollectionsMap] = useState<Record<string, string[]>>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_ENTRY_COLS_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const applyMapCounts = useCallback((cols: Collection[], map: Record<string, string[]>): Collection[] => {
+    const counts: Record<string, number> = {};
+    Object.values(map).forEach((colIds) => {
+      if (Array.isArray(colIds)) {
+        colIds.forEach((cid) => {
+          counts[cid] = (counts[cid] || 0) + 1;
+        });
+      }
+    });
+    return cols.map((c) => ({
+      ...c,
+      entry_count: counts[c.id] ?? c.entry_count ?? 0,
+    }));
+  }, []);
 
   // Helper to persist collections to local storage
   const saveCollectionsLocally = (cols: Collection[]) => {
@@ -90,8 +115,11 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // 1. Always ensure local cache is loaded
       const savedCols = localStorage.getItem(LOCAL_COLLECTIONS_KEY);
       const savedTags = localStorage.getItem(LOCAL_TAGS_KEY);
+      const savedEntryCols = localStorage.getItem(LOCAL_ENTRY_COLS_KEY);
+      const localMap: Record<string, string[]> = savedEntryCols ? JSON.parse(savedEntryCols) : {};
+      setEntryCollectionsMap(localMap);
       if (savedCols) {
-        setCollections(JSON.parse(savedCols));
+        setCollections(applyMapCounts(JSON.parse(savedCols), localMap));
       }
       if (savedTags) {
         setTags(JSON.parse(savedTags));
@@ -99,6 +127,28 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       // 2. If user is logged in and online, attempt Supabase sync
       if (user && navigator.onLine) {
+        let mergedMap = { ...localMap };
+        try {
+          const { data: relData, error: relError } = await supabase
+            .from('entry_collections')
+            .select('entry_id, collection_id');
+
+          if (!relError && relData) {
+            const remoteMap: Record<string, string[]> = {};
+            relData.forEach((row: { entry_id: string; collection_id: string }) => {
+              if (!remoteMap[row.entry_id]) remoteMap[row.entry_id] = [];
+              if (!remoteMap[row.entry_id].includes(row.collection_id)) {
+                remoteMap[row.entry_id].push(row.collection_id);
+              }
+            });
+            mergedMap = { ...localMap, ...remoteMap };
+            setEntryCollectionsMap(mergedMap);
+            localStorage.setItem(LOCAL_ENTRY_COLS_KEY, JSON.stringify(mergedMap));
+          }
+        } catch (relErr) {
+          console.warn('Supabase entry_collections query failed (using local cache):', relErr);
+        }
+
         try {
           const { data: colsData, error: colsError } = await supabase
             .from('collections')
@@ -117,8 +167,9 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
               updated_at: c.updated_at,
               entry_count: c.entry_collections?.[0]?.count || 0,
             }));
-            setCollections(formatted);
-            saveCollectionsLocally(formatted);
+            const withCounts = applyMapCounts(formatted, mergedMap);
+            setCollections(withCounts);
+            saveCollectionsLocally(withCounts);
           } else if (colsError) {
             console.warn('Supabase collections query notice:', colsError.message);
           }
@@ -339,11 +390,17 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const setEntryCollections = async (entryId: string, collectionIds: string[]) => {
-    // 1. Save locally
+    // 1. Save locally and update state + collection counts immediately
     try {
       const map = JSON.parse(localStorage.getItem(LOCAL_ENTRY_COLS_KEY) || '{}');
       map[entryId] = collectionIds;
       localStorage.setItem(LOCAL_ENTRY_COLS_KEY, JSON.stringify(map));
+      setEntryCollectionsMap(map);
+      setCollections((prev) => {
+        const updated = applyMapCounts(prev, map);
+        saveCollectionsLocally(updated);
+        return updated;
+      });
     } catch (e) {
       console.warn('Failed to save entry collections locally:', e);
     }
@@ -429,6 +486,7 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       value={{
         collections,
         tags,
+        entryCollectionsMap,
         isLoading,
         createCollection,
         updateCollection,
